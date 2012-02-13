@@ -22,105 +22,118 @@
 
 MadvertiseView *ad;
 
-
 - (void)dealloc {
-  if(madvertiseDemoDelegate)
-    [madvertiseDemoDelegate release];
-  [super dealloc];
-}
-
-
-- (void)showAd:(id)sender event:(id)event
-{
-  if(ad)
-    return;
-  madvertiseDemoDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
-  ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:2];
-  //ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
-  [ad place_at_x:0 y:60];
-  [self.view addSubview:ad];
-  [self.view bringSubviewToFront:ad];
-}
-
-- (void)removeAd:(id)sender event:(id)event
-{
-  if(ad)
-    [ad removeFromSuperview];
-  ad = nil; 
+    if (madvertiseDemoDelegate) {
+        [madvertiseDemoDelegate release];
+    }
+    
+    [super dealloc];
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  UIButton *btn= [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
-  btn.frame = CGRectMake(100, 100, 100, 25);
-  btn.backgroundColor = [UIColor clearColor];
-  [btn addTarget:self action:@selector(showAd:event:) forControlEvents:UIControlEventTouchUpInside];
-  [btn setTitle:@"Show ad" forState:UIControlStateNormal];
-  [self.view addSubview:btn]; 
-  [btn release];
-
+//  UIButton *btn= [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
+//  btn.frame = CGRectMake(100, 100, 100, 25);
+//  btn.backgroundColor = [UIColor clearColor];
+//  [btn addTarget:self action:@selector(showAd:event:) forControlEvents:UIControlEventTouchUpInside];
+//  [btn setTitle:@"Show ad" forState:UIControlStateNormal];
+//  [self.view addSubview:btn]; 
+//  [btn release];
+//  
+//  UIButton *btn2= [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
+//  btn2.frame = CGRectMake(100, 200, 100, 25);
+//  btn2.backgroundColor = [UIColor clearColor];
+//  [btn2 addTarget:self action:@selector(removeAd:event:) forControlEvents:UIControlEventTouchUpInside];
+//  [btn2 setTitle:@"Remove" forState:UIControlStateNormal];
+//  [self.view addSubview:btn2]; 
+//  [btn2 release];
   
-  UIButton *btn2= [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
-  btn2.frame = CGRectMake(100, 200, 100, 25);
-  btn2.backgroundColor = [UIColor clearColor];
-  [btn2 addTarget:self action:@selector(removeAd:event:) forControlEvents:UIControlEventTouchUpInside];
-  [btn2 setTitle:@"Remove" forState:UIControlStateNormal];
-  [self.view addSubview:btn2]; 
-  [btn2 release];
-  
-//  MadvertiseView *ad2 = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassLeaderboard secondsToRefresh:25];
-//  [ad2 place_at_x:0 y:140];
-//  [self.view addSubview:ad2];
-//  [self.view bringSubviewToFront:ad2];
-//  
-//  
-//  MadvertiseView *ad3 = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait secondsToRefresh:25];
-//  [ad3 place_at_x:0 y:320];
-//  [self.view addSubview:ad3];
-//  [self.view bringSubviewToFront:ad3];
-//  
-//  
-//  ad3 = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassFullscreen secondsToRefresh:25];
-//  [ad3 place_at_x:0 y:420];
-//  [self.view addSubview:ad3];
-//  [self.view bringSubviewToFront:ad3];
+//    Create a new MadvertiseSDKSampleDelegate
+    
+    madvertiseDemoDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
+    
+//    Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
+//    However, it is not recommended to use more than four of them. Futher more it is not recommended to use more than one RichMedia ad.
+//
+//    withClass: [MadvertiseAdClassMMA|MadvertiseAdClassMediumRectangle|MadvertiseAdClassLeaderboard|
+//                  MadvertiseAdClassFullscreen|MadvertiseAdClassPortrait|MadvertiseAdClassLandscape|MadvertiseAdClassRichMedia], the ad type.
+//    secondsToRefresh: [integer], the time after which a new ad will be loaded.
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        /* run something specific for the iPad */
+        
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait secondsToRefresh:30];
+    } else {
+        /* run something specific for the iPhone */
+        
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
+//        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+    }
+    
+    [ad place_at_x:0 y:0];
+    [self.view addSubview:ad];
+    [self.view bringSubviewToFront:ad];
 }
 
+- (void) viewWillAppear:(BOOL)animated {
+    //observing adLoaded, adLoadFailed and adClose Events
+    [MadvertiseView adLoadedHandlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:)];
+    [MadvertiseView adLoadFailedHandlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:)];
+    [MadvertiseView adClosedHandlerWithObserver:self AndSelector:@selector(onAdClose:)];
+}
+
+- (void) viewWillDisappear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 - (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];
+    [super didReceiveMemoryWarning];
 }
 
 
 #pragma mark - 
 #pragma mark Notifications
 
-- (void) onAdLoadedSuccessfully:(NSNotification*)notify{
-  MadLog(@"successfully loaded with code: %@",[notify object]);
+- (void) onAdLoadedSuccessfully:(NSNotification*)notify {
+    MadLog(@"successfully loaded with code: %@",[notify object]);
 }
 
-- (void) onAdLoadedFailed:(NSNotification*)notify{
-  MadLog(@"ad load faild with code: %@",[notify object]);
+- (void) onAdLoadedFailed:(NSNotification*)notify {
+    MadLog(@"ad load faild with code: %@",[notify object]);
 }
 - (void) onAdClose:(NSNotification*)notify{
-  // can occure for rich media ads which do not refresh automatically
-  MadLog(@"ad was closed");
-  if(ad)
-    [ad removeFromSuperview];
-  ad = nil; 
+    // can occure for rich media ads which do not refresh automatically
+    MadLog(@"ad was closed");
+    if(ad) {
+        [ad removeFromSuperview];
+    }
+    ad = nil; 
 }
 
-- (void) viewWillAppear:(BOOL)animated{
-  //observing adLoaded, adLoadFailed and adClose Events
-  [MadvertiseView adLoadedHandlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:)];
-  [MadvertiseView adLoadFailedHandlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:)];
-  [MadvertiseView adClosedHandlerWithObserver:self AndSelector:@selector(onAdClose:)];
-  
-}
 
-- (void) viewWillDisappear:(BOOL)animated{
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
+//- (void)showAd:(id)sender event:(id)event
+//{
+//    if (ad) {
+//        return;
+//    }
+//    
+//    madvertiseDemoDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
+//    ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
+//    //ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+//    
+//    [ad place_at_x:0 y:0];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
+//}
+
+//- (void)removeAd:(id)sender event:(id)event
+//{
+//    if(ad) {
+//        [ad removeFromSuperview];
+//    }
+//    
+//    ad = nil; 
+//}
 
 @end

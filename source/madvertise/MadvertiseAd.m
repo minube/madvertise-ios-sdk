@@ -32,7 +32,7 @@
 -(MadvertiseAd*)initFromDictionary:(NSDictionary*)dictionary {
 
   if ((self = [super init])) {
-    MadLog(@"%@", dictionary);
+//  MadLog(@"%@", dictionary);
 
     clickUrl     = [[dictionary objectForKey:@"click_url"] retain];
     text         = [([dictionary objectForKey:@"text"] ?: @"") retain];

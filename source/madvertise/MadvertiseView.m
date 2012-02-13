@@ -84,8 +84,10 @@ NSString * const MadvertiseAdClass_toString[] = {
   self.receivedData = nil;
   self.rootViewController = nil;
 
-  [self stopTimer];
-  self.timer = nil;
+  if (self.timer) {
+    [self stopTimer];
+    self.timer = nil;
+  }
 
   [inAppLandingPageController release];
   self.inAppLandingPageController = nil;
@@ -214,8 +216,7 @@ NSString * const MadvertiseAdClass_toString[] = {
     // load first ad
     lock = [[NSLock alloc] init];
     [self loadAd];
-    if(secondsToRefresh > 0)
-      [self createAdReloadTimer];
+    [self createAdReloadTimer];
 
     animationDuration = 0.75;
     
@@ -453,10 +454,12 @@ NSString * const MadvertiseAdClass_toString[] = {
 }
 
 - (void)createAdReloadTimer {
-  // prepare automatic refresh
-  MadLog(@"Init Ad reload timer");
-  [self stopTimer];
-  self.timer = [NSTimer scheduledTimerWithTimeInterval: interval target: self selector: @selector(timerFired:) userInfo: nil repeats: YES];
+    // prepare automatic refresh
+    if (interval > 0) {
+        MadLog(@"Init Ad reload timer");
+        [self stopTimer];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval: interval target: self selector: @selector(timerFired:) userInfo: nil repeats: YES];
+    }
 }
 
 - (void)inAppBrowserClosed {
@@ -511,7 +514,7 @@ NSString * const MadvertiseAdClass_toString[] = {
   self.frame = CGRectMake(x, y , currentAd.width, currentAd.height);
   UIWebView* view = nil;
   // we create a new view to display the add
-  MadLog(@"htmlContent: %@",[currentAd to_html]);
+//  MadLog(@"htmlContent: %@",[currentAd to_html]);
   view = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0 , currentAd.width, currentAd.height)];
   if(currentAdClass == MadvertiseAdClassRichMedia) {
     view.opaque = NO;

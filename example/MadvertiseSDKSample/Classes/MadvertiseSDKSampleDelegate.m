@@ -35,10 +35,6 @@
   return MadvertiseAnimationClassFade;
 }
 
-//- (NSString*) adServer {
-//  return @"http://192.168.1.128:12345";
-//}
-
 - (CLLocationCoordinate2D) location {
     CLLocationCoordinate2D _location = { 8.807081, 53.074981 };
     return _location;
@@ -55,5 +51,9 @@
 - (NSString *) gender {
   return @"M";
 }
+
+//- (NSString*) adServer {
+//  return @"http://192.168.1.128:12345";
+//}
 
 @end
