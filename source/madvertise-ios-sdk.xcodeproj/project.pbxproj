@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D0A076D14F5342000852970 /* MRAdView+Controllers.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A075F14F5342000852970 /* MRAdView+Controllers.h */; };
+		4D0A076E14F5342000852970 /* MRAdView.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A076014F5342000852970 /* MRAdView.h */; };
+		4D0A076F14F5342000852970 /* MRAdView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076114F5342000852970 /* MRAdView.m */; };
+		4D0A077014F5342000852970 /* MRAdViewBrowsingController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A076214F5342000852970 /* MRAdViewBrowsingController.h */; };
+		4D0A077114F5342000852970 /* MRAdViewBrowsingController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076314F5342000852970 /* MRAdViewBrowsingController.m */; };
+		4D0A077214F5342000852970 /* MRAdViewDisplayController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A076414F5342000852970 /* MRAdViewDisplayController.h */; };
+		4D0A077314F5342000852970 /* MRAdViewDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076514F5342000852970 /* MRAdViewDisplayController.m */; };
+		4D0A077414F5342000852970 /* MRCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A076614F5342000852970 /* MRCommand.h */; };
+		4D0A077514F5342000852970 /* MRCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076714F5342000852970 /* MRCommand.m */; };
+		4D0A077614F5342000852970 /* MRDimmingView.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A076814F5342000852970 /* MRDimmingView.h */; };
+		4D0A077714F5342000852970 /* MRDimmingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076914F5342000852970 /* MRDimmingView.m */; };
+		4D0A077814F5342000852970 /* MRProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A076A14F5342000852970 /* MRProperty.h */; };
+		4D0A077914F5342000852970 /* MRProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076B14F5342000852970 /* MRProperty.m */; };
 		4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */; };
 		4D8BE2E014D6E04A00212FD0 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */; };
 		5B4E248813F0323700F67F5A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B0A658013EFEA7B0032A2DD /* Foundation.framework */; };
@@ -22,6 +35,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4D0A075E14F5342000852970 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		4D0A075F14F5342000852970 /* MRAdView+Controllers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MRAdView+Controllers.h"; sourceTree = "<group>"; };
+		4D0A076014F5342000852970 /* MRAdView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRAdView.h; sourceTree = "<group>"; };
+		4D0A076114F5342000852970 /* MRAdView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRAdView.m; sourceTree = "<group>"; };
+		4D0A076214F5342000852970 /* MRAdViewBrowsingController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRAdViewBrowsingController.h; sourceTree = "<group>"; };
+		4D0A076314F5342000852970 /* MRAdViewBrowsingController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRAdViewBrowsingController.m; sourceTree = "<group>"; };
+		4D0A076414F5342000852970 /* MRAdViewDisplayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRAdViewDisplayController.h; sourceTree = "<group>"; };
+		4D0A076514F5342000852970 /* MRAdViewDisplayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRAdViewDisplayController.m; sourceTree = "<group>"; };
+		4D0A076614F5342000852970 /* MRCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRCommand.h; sourceTree = "<group>"; };
+		4D0A076714F5342000852970 /* MRCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRCommand.m; sourceTree = "<group>"; };
+		4D0A076814F5342000852970 /* MRDimmingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRDimmingView.h; sourceTree = "<group>"; };
+		4D0A076914F5342000852970 /* MRDimmingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRDimmingView.m; sourceTree = "<group>"; };
+		4D0A076A14F5342000852970 /* MRProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRProperty.h; sourceTree = "<group>"; };
+		4D0A076B14F5342000852970 /* MRProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRProperty.m; sourceTree = "<group>"; };
+		4D0A076C14F5342000852970 /* MRAID.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MRAID.bundle; sourceTree = SOURCE_ROOT; };
 		4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = SOURCE_ROOT; };
 		4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = SOURCE_ROOT; };
 		5B0A658013EFEA7B0032A2DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -51,6 +79,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D0A075D14F5342000852970 /* MRAID */ = {
+			isa = PBXGroup;
+			children = (
+				4D0A075E14F5342000852970 /* LICENSE */,
+				4D0A075F14F5342000852970 /* MRAdView+Controllers.h */,
+				4D0A076014F5342000852970 /* MRAdView.h */,
+				4D0A076114F5342000852970 /* MRAdView.m */,
+				4D0A076214F5342000852970 /* MRAdViewBrowsingController.h */,
+				4D0A076314F5342000852970 /* MRAdViewBrowsingController.m */,
+				4D0A076414F5342000852970 /* MRAdViewDisplayController.h */,
+				4D0A076514F5342000852970 /* MRAdViewDisplayController.m */,
+				4D0A076614F5342000852970 /* MRCommand.h */,
+				4D0A076714F5342000852970 /* MRCommand.m */,
+				4D0A076814F5342000852970 /* MRDimmingView.h */,
+				4D0A076914F5342000852970 /* MRDimmingView.m */,
+				4D0A076A14F5342000852970 /* MRProperty.h */,
+				4D0A076B14F5342000852970 /* MRProperty.m */,
+			);
+			path = MRAID;
+			sourceTree = SOURCE_ROOT;
+		};
 		4D8BE2DC14D6E02B00212FD0 /* JSONKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +137,8 @@
 		5B0A658213EFEA7B0032A2DD /* madvertise-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				4D0A075D14F5342000852970 /* MRAID */,
+				4D0A076C14F5342000852970 /* MRAID.bundle */,
 				4D8BE2DC14D6E02B00212FD0 /* JSONKit */,
 				5B0A65B813F00B660032A2DD /* madvertise */,
 			);
@@ -124,6 +175,13 @@
 				5B63957613F40F58003D95AF /* MadvertiseUtilities.h in Headers */,
 				5B6395A813F411F4003D95AF /* MadvertiseView.h in Headers */,
 				4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */,
+				4D0A076D14F5342000852970 /* MRAdView+Controllers.h in Headers */,
+				4D0A076E14F5342000852970 /* MRAdView.h in Headers */,
+				4D0A077014F5342000852970 /* MRAdViewBrowsingController.h in Headers */,
+				4D0A077214F5342000852970 /* MRAdViewDisplayController.h in Headers */,
+				4D0A077414F5342000852970 /* MRCommand.h in Headers */,
+				4D0A077614F5342000852970 /* MRDimmingView.h in Headers */,
+				4D0A077814F5342000852970 /* MRProperty.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +242,12 @@
 				5B6395B513F41205003D95AF /* MadvertiseTracker.m in Sources */,
 				5B6395B713F41205003D95AF /* InAppLandingPageController.m in Sources */,
 				4D8BE2E014D6E04A00212FD0 /* JSONKit.m in Sources */,
+				4D0A076F14F5342000852970 /* MRAdView.m in Sources */,
+				4D0A077114F5342000852970 /* MRAdViewBrowsingController.m in Sources */,
+				4D0A077314F5342000852970 /* MRAdViewDisplayController.m in Sources */,
+				4D0A077514F5342000852970 /* MRCommand.m in Sources */,
+				4D0A077714F5342000852970 /* MRDimmingView.m in Sources */,
+				4D0A077914F5342000852970 /* MRProperty.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
