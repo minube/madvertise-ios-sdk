@@ -15,6 +15,17 @@
 #import <Foundation/NSData.h>
 #import "MadvertiseUtilities.h"
 
+NSString* UserAgentString() {
+	//static NSString *userAgent = nil;
+    static NSString *userAgent = @"Mozilla/5.0 (iPhone; U; CPU like Mac OS X; nb-no) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3";
+	
+    if (!userAgent) {
+        UIWebView *webview = [[UIWebView alloc] init];
+        userAgent = [[webview stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"] copy];  
+        [webview release];
+    }
+    return userAgent;
+}
 
 @implementation MadvertiseUtilities
 
@@ -107,8 +118,8 @@ static char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123
     
 }
 
-+ (NSString*) buildUserAgent:(UIDevice *)device {
-  return [NSString stringWithFormat:@"iPhone APP-UA - %@ - %@ - %@ - %@", [device systemName],[device systemVersion], [device model], [device localizedModel]];
++ (NSString*) getDeviceIDHash {
+    return [MadvertiseUtilities base64Hash:[[UIDevice currentDevice] uniqueIdentifier]];
 }
 
 + (NSString*) getTimestamp {

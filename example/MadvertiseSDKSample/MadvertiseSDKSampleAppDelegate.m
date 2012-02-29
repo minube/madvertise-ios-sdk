@@ -24,6 +24,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   // [MadvertiseTracker enable];
+  // [MadvertiseTracker reportActionToMadvertise:@"launch"];
 
   viewController = [MadvertiseSDKSampleViewController new];
   

@@ -15,18 +15,18 @@
 #import <Foundation/Foundation.h>
 
 @interface MadvertiseAd : NSObject {
-  NSString* clickUrl;
-  NSString* bannerUrl;
-  NSString* bannerType;
-  NSString* richmediaUrl;
+    NSString* clickUrl;
+    NSString* bannerUrl;
+    NSString* bannerType;
+    NSString* richmediaUrl;
   
-  
-  NSString* text;
-  bool isRichMedia;
-  bool hasBanner;
-  bool shouldOpenInAppBrowser;
-  int width;
-  int height;
+    NSString* text;
+    bool isRichMedia;
+    bool hasBanner;
+    bool shouldOpenInAppBrowser;
+    int width;
+    int height;
+    bool isMraid;
 }
 
 @property(nonatomic,retain) NSString *clickUrl;
@@ -36,6 +36,7 @@
 @property(nonatomic,retain) NSString *text;
 
 @property bool isRichMedia;
+@property bool isMraid;
 @property bool hasBanner;
 @property bool shouldOpenInAppBrowser;
 @property int height;

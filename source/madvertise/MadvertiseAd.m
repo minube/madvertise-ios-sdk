@@ -25,6 +25,7 @@
 @synthesize text;
 @synthesize hasBanner;
 @synthesize isRichMedia;
+@synthesize isMraid;
 @synthesize width;
 @synthesize height;
 @synthesize shouldOpenInAppBrowser;
@@ -32,35 +33,53 @@
 -(MadvertiseAd*)initFromDictionary:(NSDictionary*)dictionary {
 
   if ((self = [super init])) {
-//  MadLog(@"%@", dictionary);
+      MadLog(@"%@", dictionary);
 
-    clickUrl     = [[dictionary objectForKey:@"click_url"] retain];
-    text         = [([dictionary objectForKey:@"text"] ?: @"") retain];
-    hasBanner    = [[dictionary objectForKey:@"has_banner"] boolValue];
-    shouldOpenInAppBrowser = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
+      clickUrl                = [[dictionary objectForKey:@"click_url"] retain];
+      text                    = [([dictionary objectForKey:@"text"] ?: @"") retain];
+      hasBanner               = [[dictionary objectForKey:@"has_banner"] boolValue];
+      shouldOpenInAppBrowser  = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
 
-    width  = 320;
-    height = 53;
+      width  = 320;
+      height = 53;
    
-    if(hasBanner) {
-      bannerUrl    = [[[dictionary objectForKey:@"banner"] objectForKey:@"url"] retain];
-      bannerType   = [[[dictionary objectForKey:@"banner"] objectForKey:@"type"] retain];
-      // could be rich media
-      if([bannerType isEqualToString:@"rich_media"]) {
-        isRichMedia = YES;
-        NSDictionary* rm = [[dictionary objectForKey:@"banner"] objectForKey:@"rich_media"];
-        richmediaUrl = [[rm objectForKey:@"full_url"] retain];
+      if (hasBanner) {
+          bannerUrl    = [[[dictionary objectForKey:@"banner"] objectForKey:@"url"] retain];
+          bannerType   = [[[dictionary objectForKey:@"banner"] objectForKey:@"type"] retain];
+          isMraid      = [[[dictionary objectForKey:@"banner"] objectForKey:@"mraid"] boolValue];
+          
+          // get mraid size
+          if (isMraid) {
+              id w = [dictionary objectForKey:@"ad_width"];
+              if (w) {
+                  width = [w intValue];
+              }
+              
+              id h = [dictionary objectForKey:@"ad_height"];
+              if (h) {
+                  height = [h intValue];
+              }
+          }
         
-        id w = [rm objectForKey:@"width"];
-        if(w)
-          width = [w intValue];
-        id h = [rm objectForKey:@"height"];
-        if(h)
-          width = [h intValue];
-      } else {
-        isRichMedia = NO;
+          // could be rich media
+          if ([bannerType isEqualToString:@"rich_media"]) {
+              isRichMedia = YES;
+              NSDictionary* rm = [[dictionary objectForKey:@"banner"] objectForKey:@"rich_media"];
+              richmediaUrl = [[rm objectForKey:@"full_url"] retain];
+        
+              id w = [rm objectForKey:@"width"];
+              if (w) {
+                  width = [w intValue];
+              }
+                  
+              id h = [rm objectForKey:@"height"];
+              if (h) {
+                  height = [h intValue];
+              }
+          } else {
+              isRichMedia = NO;
+          }
       }
-    }
   }
   return self;
 }
@@ -142,43 +161,53 @@
   "</body>"
   "</html>";
 
-
   return [NSString stringWithFormat:template, self.richmediaUrl];
 }
 
--(NSString*)to_html {
-  if(self.isRichMedia) {
-    return [self richmediaToHtml];
-  }
-  if(!self.hasBanner)
-    return [self textAdToHtml];
+-(NSString*) mraidToHtnl {
+    return [NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl];
+}
+
+-(NSString*) to_html {
+    if (self.isRichMedia) {
+      return [self richmediaToHtml];
+    }
+    
+    if (self.isMraid) {
+        return [self mraidToHtnl];
+    }
+    
+    if (!self.hasBanner) {
+        return [self textAdToHtml];
+    }
   
-  NSString* template = @""
-  "<html>"
-  "<head>"
-  "<style type=\"text/css\"> body {margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; background-color:black; text-align:center; border:none}</style>"
-  "</head>"
-  "<body>"
-  "%@"
-  "</body>"
-  "</html>";
+    NSString* template = @""
+        "<html>"
+        "<head>"
+        "<style type=\"text/css\"> body {margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; background-color:black; text-align:center; border:none}</style>"
+        "</head>"
+        "<body>"
+        "%@"
+        "</body>"
+        "</html>";
 
-  NSString* body = @"";
+    NSString* body = @"";
 
-  if (self.bannerUrl) {
-    body = [NSString stringWithFormat:@"<img src=\"%@\"></img>", self.bannerUrl];
-  }
-
-  return [NSString stringWithFormat:template, body];
+    if (self.bannerUrl) {
+        body = [NSString stringWithFormat:@"<img src=\"%@\"></img>", self.bannerUrl];
+    }
+    
+    return [NSString stringWithFormat:template, body];
 }
 
 - (void)dealloc {
-  self.clickUrl = nil;
-  self.bannerUrl = nil;
-  self.text = nil;
+    self.clickUrl = nil;
+    self.bannerUrl = nil;
+    self.text = nil;
     self.bannerType = nil;
     self.richmediaUrl = nil;
 
-  [super dealloc];
+    [super dealloc];
 }
+
 @end

@@ -28,10 +28,40 @@
 #define MadLog(format, ...)
 #endif
 
+#define MADVERTISE_SDK_VERION @"4.3.0"
+
+#define MADVERTISE_USER_AGENT_KEY @"ua"
+#define MADVERTISE_APP_KEY @"app"
+#define MADVERTISE_DEVICE_ID_KEY @"udid"
+#define MADVERTISE_IP_KEY @"ip"
+#define MADVERTISE_FORMAT_KEY @"format"
+#define MADVERTISE_REQUESTER_KEY @"requester"
+#define MADVERTISE_TIMESTAMP_KEY @"ts"
+#define MADVERTISE_BANNER_TYPE_KEY @"banner_type"
+#define MADVERTISE_ACTION_TYPE_KEY @"at"
+#define MADVERTISE_APP_NAME_KEY @"app_name"
+#define MADVERTISE_APP_VERSION_KEY @"app_version"
+#define MADVERTISE_FIRST_LAUNCH_KEY @"first_launch"
+#define MADVERTISE_DEBUG_KEY @"debug"
+#define MADVERTISE_SDK_VERION_KEY @"version"
+#define MADVERTISE_AGE_KEY @"age"
+#define MADVERTISE_GENDER_KEY @"gender"
+#define MADVERTISE_LNG_KEY @"lng"
+#define MADVERTISE_LAT_KEY @"lat"
+#define MADVERTISE_ORIENTATION_KEY @"orientation"
+#define MADVERTISE_DEVICE_WIDTH_KEY @"device_width"
+#define MADVERTISE_DEVICE_HEIGHT_KEY @"device_height"
+#define MADVERTISE_PARENT_HEIGHT_KEY @"parent_height"
+#define MADVERTISE_PARENT_WIDTH_KEY @"parent_width"
+#define MADVERTISE_MRAID_KEY @"mr"
+
+
+NSString *UserAgentString(void);
+
 @interface MadvertiseUtilities : NSObject
 + (NSString *) getIP;
 + (NSString *) base64Hash:(NSString*) toHash;
-+ (NSString *) buildUserAgent:(UIDevice*) device;
++ (NSString*) getDeviceIDHash;
 + (NSString *) getTimestamp;
 + (NSString*) getAppName;
 + (NSString*) getAppVersion;

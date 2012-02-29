@@ -63,11 +63,11 @@ MadvertiseView *ad;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         /* run something specific for the iPad */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait secondsToRefresh:30];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
     } else {
         /* run something specific for the iPhone */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
 //        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
     }
     
@@ -77,10 +77,10 @@ MadvertiseView *ad;
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-    //observing adLoaded, adLoadFailed and adClose Events
-    [MadvertiseView adLoadedHandlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:)];
-    [MadvertiseView adLoadFailedHandlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:)];
-    [MadvertiseView adClosedHandlerWithObserver:self AndSelector:@selector(onAdClose:)];
+    //observing adLoaded, adLoadFailed and adRichMediaClose Events
+    [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:) ForEvent:@"MadvertiseAdLoaded"];
+    [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:) ForEvent:@"MadvertiseAdLoadFailed"];
+    [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdClose:) ForEvent:@"MadvertiseRichMediaAdClosed"];
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -105,7 +105,7 @@ MadvertiseView *ad;
 - (void) onAdClose:(NSNotification*)notify{
     // can occure for rich media ads which do not refresh automatically
     MadLog(@"ad was closed");
-    if(ad) {
+    if (ad) {
         [ad removeFromSuperview];
     }
     ad = nil; 

@@ -18,7 +18,6 @@
 
 // static variables
 static BOOL madvertiseTrackerDebugMode = YES;
-
 static BOOL trackerAlreadyEnabled = NO;
 
 static NSString *productToken = @"test";
@@ -27,37 +26,42 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
 
 @implementation MadvertiseTracker
 
-
 + (void) enable {
+    if (trackerAlreadyEnabled) {
+        return;
+    }
+    
+    trackerAlreadyEnabled = YES;
   
-  if(trackerAlreadyEnabled)
-    return;
-  trackerAlreadyEnabled = YES;
+    [MadvertiseTracker reportActionToMadvertise:@"launch"];
   
-  [MadvertiseTracker reportActionToMadvertise:@"launch"];
-  
-  [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                     object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
-                                                      [MadvertiseTracker reportActionToMadvertise:@"active"];
+                                                        [MadvertiseTracker reportActionToMadvertise:@"active"];
                                                     }];
-
-  [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification
                                                     object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
-                                                      [MadvertiseTracker reportActionToMadvertise:@"inactive"];
+                                                        [MadvertiseTracker reportActionToMadvertise:@"inactive"];
                                                     }];
-  
-  [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillTerminateNotification
                                                     object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
-                                                      [MadvertiseTracker reportActionToMadvertise:@"stop"];
+                                                        [MadvertiseTracker reportActionToMadvertise:@"stop"];
                                                     }];
-  
-  
-  
 }
 
-+ (void) reportActionToMadvertise:(NSString*) action_type {
-  [MadvertiseTracker performSelectorInBackground:@selector(report:) withObject:action_type];
-
++ (void) reportActionToMadvertise:(NSString*) action_type {    
+	NSMutableDictionary *context = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+							 UserAgentString(),                                 MADVERTISE_USER_AGENT_KEY,
+							 action_type,                                       MADVERTISE_ACTION_TYPE_KEY,
+                             [MadvertiseUtilities getIP],                       MADVERTISE_IP_KEY,
+                             [MadvertiseUtilities getDeviceIDHash],             MADVERTISE_DEVICE_ID_KEY,
+                             [MadvertiseUtilities getTimestamp],                MADVERTISE_TIMESTAMP_KEY,
+                             [MadvertiseUtilities getAppName],                  MADVERTISE_APP_NAME_KEY,
+                             [MadvertiseUtilities getAppVersion],               MADVERTISE_APP_VERSION_KEY,
+                             (madvertiseTrackerDebugMode ? @"true" : @"false"), MADVERTISE_DEBUG_KEY,
+                             nil];
+    
+    [MadvertiseTracker performSelectorInBackground:@selector(report:) withObject:context];
 }
 
 + (void) setDebugMode: (BOOL) debug {
@@ -68,71 +72,52 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
 	productToken = token;
 }
 
-+ (void) report: (NSString*) action_type {
++ (void) report: (NSMutableDictionary*) context {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 	NSString *documentsDirectory = [paths objectAtIndex:0];
-	
-  MadLog(@"%@", documentsDirectory);
-	
-  NSString *appOpenPath = [documentsDirectory stringByAppendingPathComponent:@"mad_launch_tracking"];
+    MadLog(@"%@", documentsDirectory);
+    NSString *appOpenPath = [documentsDirectory stringByAppendingPathComponent:@"mad_launch_tracking"];
 	NSFileManager *fileManager = [NSFileManager defaultManager];
+    bool firstLaunch = ![fileManager fileExistsAtPath:appOpenPath];
+    [context setValue:(firstLaunch ? @"1" : @"0") forKey:MADVERTISE_FIRST_LAUNCH_KEY];
     
-  bool firstLaunch = ![fileManager fileExistsAtPath:appOpenPath];
+    MadLog(@"Sending tracking request to madvertise. token=%@",productToken);
 	
-  MadLog(@"Sending tracking request to madvertise. token=%@",productToken);
-	
-	UIDevice* device = [UIDevice currentDevice];
 	NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", madServer , productToken]];
 	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
 	NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];  
 	[headers setValue:@"application/x-www-form-urlencoded; charset=utf-8" forKey:@"Content-Type"];
 	
-	// set request parameter
-	NSMutableDictionary* post_params = [[NSMutableDictionary alloc] init];
-	[post_params setValue:[MadvertiseUtilities buildUserAgent:device] forKey:@"ua"];
-	[post_params setValue:[MadvertiseUtilities getIP] forKey:@"ip"];
-  [post_params setValue:[MadvertiseUtilities base64Hash:[device uniqueIdentifier]] forKey:@"udid"];
-  [post_params setValue:[MadvertiseUtilities getTimestamp] forKey:@"ts"];  
-  [post_params setValue:action_type forKey:@"at"];  
-  [post_params setValue:(firstLaunch ? @"1" : @"0") forKey:@"first_launch"];  
-  [post_params setValue:[MadvertiseUtilities getAppName] forKey:@"app_name"];
-  [post_params setValue:[MadvertiseUtilities getAppVersion] forKey:@"app_version"];
-	
-	if (madvertiseTrackerDebugMode)
-		[post_params setValue:@"true" forKey:@"debug"]; 
-	
-  NSString *body = @"";	
+    NSString *body = @"";	
 	unsigned int n = 0;
-	for(NSString *key in post_params) {
-		body = [body stringByAppendingString:[NSString stringWithFormat:@"%@=%@", key, [post_params objectForKey:key]]];
-		if(++n != [post_params count]) 
-			body = [body stringByAppendingString:@"&"];
+	for(NSString *key in context) {
+		body = [body stringByAppendingString:[NSString stringWithFormat:@"%@=%@", key, [context objectForKey:key]]];
+		if(++n != [context count]) {
+            body = [body stringByAppendingString:@"&"];
+        }
 	}
-  
-  [post_params release];
 	
-  [request setHTTPMethod:@"POST"];  
+    [request setHTTPMethod:@"POST"];  
 	[request setAllHTTPHeaderFields:headers]; 
 	[request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
 	
 	NSURLResponse *response = nil;
 	NSError *error  = nil;
 	
-  NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 	if( (!error) && ([(NSHTTPURLResponse *)response statusCode] == 200)) {
 		[fileManager createFileAtPath:appOpenPath contents:nil attributes:nil];
 	}
 
 #ifdef DEBUG
 	NSString* debugMessage = [[NSString alloc] initWithData:responseData encoding: NSUTF8StringEncoding];
-  MadLog(@"Response from madvertise %@", debugMessage);
-  [debugMessage release];
+    MadLog(@"Response from madvertise %@", debugMessage);
+    [debugMessage release];
 #endif 
   
-  [headers release];
-    
+    [headers release];
     [pool release];
 }
 

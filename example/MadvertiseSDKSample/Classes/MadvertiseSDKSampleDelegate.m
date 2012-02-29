@@ -20,7 +20,8 @@
 #pragma mark MadvertiseDelegateProtocol Methods
 
 - (NSString *) appId {
-  return @"TestTokn";
+    return @"response-ios.json";
+//    return @"TestTokn";
 }
 
 - (BOOL) debugEnabled {
@@ -52,8 +53,9 @@
   return @"M";
 }
 
-//- (NSString*) adServer {
-//  return @"http://192.168.1.128:12345";
-//}
+- (NSString*) adServer {
+//    return @"http://localhost:9292";
+    return @"http://dl.dropbox.com/u/44264257";
+}
 
 @end

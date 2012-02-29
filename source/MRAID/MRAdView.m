@@ -8,7 +8,6 @@
 
 #import "MRAdView.h"
 #import "UIWebView+MPAdditions.h"
-#import "MPGlobal.h"
 #import "MPLogging.h"
 #import "MRAdViewBrowsingController.h"
 #import "MRAdViewDisplayController.h"
@@ -253,7 +252,7 @@ static NSString * const kMraidURLScheme = @"mraid";
     
     headTagRange = [mutableHTML rangeOfString:@"<head>"];
     [mutableHTML replaceCharactersInRange:headTagRange withString:
-     [NSString stringWithFormat:@"<head><script src='%@'></script>", [mraidUrl absoluteString]]];
+    [NSString stringWithFormat:@"<head><script src='%@'></script>", @"http://dl.dropbox.com/u/44264257/MRAID_expandable/src/mraid.js"]];
     
     return [mutableHTML autorelease];
 }
