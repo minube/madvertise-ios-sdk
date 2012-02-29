@@ -14,29 +14,10 @@
 // limitations under the License.
 
 #import "MadvertiseView.h"
-#import "MRAdView.h"
-
-// PRIVATE METHODS
-
-@interface MadvertiseView ()
-- (CGSize) getScreenResolution;
-- (CGSize) getParentViewDimensions;
-- (NSString*) getDeviceOrientation;
-- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh;
-- (void) createAdReloadTimer;
-- (void) displayView;
-- (void) stopTimer;
-- (void)swapView:(UIView*)newView oldView:(UIView*) oldView;
-- (void)loadAd;       // load a new ad into an existing MadvertiseView
-- (void)openInAppBrowserWithUrl:(NSString*)url;
-                      // Ads should not be cached, nor should you request more than one ad per minute
-@end
-
 
 @implementation MadvertiseView
 
 @synthesize currentAd;
-@synthesize inAppLandingPageController;
 @synthesize request;
 @synthesize currentView;
 @synthesize timer;
@@ -73,8 +54,6 @@ NSString * const MadvertiseAdClass_toString[] = {
     self.timer = nil;
   }
 
-  [inAppLandingPageController release];
-  self.inAppLandingPageController = nil;
   self.madDelegate = nil;
     
   if(self.currentView) {
@@ -175,7 +154,7 @@ NSString * const MadvertiseAdClass_toString[] = {
 
     // just a dummy placeholder
     self.currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0, 0,0)];
-    [self addSubview:self.currentView];
+    [self addSubview: self.currentView];
     [currentView release];
     
     currentAdClass     = adClassValue;
@@ -197,7 +176,6 @@ NSString * const MadvertiseAdClass_toString[] = {
     [self createAdReloadTimer];
 
     animationDuration = 0.75;
-    
 
     if([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
       animationDuration = [madDelegate durationOfBannerAnimation];
@@ -397,7 +375,7 @@ NSString * const MadvertiseAdClass_toString[] = {
     [post_params setValue: [MadvertiseUtilities getTimestamp]         forKey:MADVERTISE_TIMESTAMP_KEY];
     [post_params setValue: MadvertiseAdClass_toString[currentAdClass] forKey:MADVERTISE_BANNER_TYPE_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
-    [post_params setValue: @"true"                                      forKey:MADVERTISE_MRAID_KEY];
+    [post_params setValue: @"true"                                    forKey:MADVERTISE_MRAID_KEY];
 
     NSString *body = @"";
     unsigned int n = 0;
@@ -445,22 +423,15 @@ NSString * const MadvertiseAdClass_toString[] = {
     }
 }
 
-- (void)inAppBrowserClosed {
-  if ([madDelegate respondsToSelector:@selector(inAppBrowserClosed)]) {
-    [madDelegate inAppBrowserClosed];
-  }
-  [self createAdReloadTimer];
-}
-
-
 // ad has been touched, open click_url from he current app according to click_action
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-  //[super touchesBegan:touches withEvent:event];
-  MadLog(@"touchesBegan");
-  if (currentAd.shouldOpenInAppBrowser)
-    [self openInAppBrowserWithUrl: currentAd.clickUrl];
-  else
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:currentAd.clickUrl]];
+    MadLog(@"touchesBegan");
+    if (currentAd.shouldOpenInAppBrowser) {
+        [self openInAppBrowserWithUrl: currentAd.clickUrl];
+    }
+    else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:currentAd.clickUrl]];
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -470,7 +441,6 @@ NSString * const MadvertiseAdClass_toString[] = {
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
 //  [super touchesEnded:touches withEvent:event];
 }
-
 
 // Refreshing the ad
 - (void)timerFired: (NSTimer *) theTimer {
@@ -488,6 +458,9 @@ NSString * const MadvertiseAdClass_toString[] = {
 
 - (void) displayView {
     MadLog(@"Display view");
+    if (isExpanded) {
+        return;
+    }
     
     if (currentAd == nil) {
         MadLog(@"No ad to show");
@@ -505,7 +478,7 @@ NSString * const MadvertiseAdClass_toString[] = {
                                                 allowsExpansion:YES
                                                 closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
                                                 placementType:placementType];
-        mraidView.delegate = self; // TODO: set protocol
+        mraidView.delegate = self;
         [mraidView loadCreativeWithHTMLString:[currentAd to_html] baseURL:nil];
     }
     else {
@@ -528,60 +501,32 @@ NSString * const MadvertiseAdClass_toString[] = {
 
 
 - (void)openInAppBrowserWithUrl: (NSString*)url {
-  
-  [self stopTimer];
-  if ([madDelegate respondsToSelector:@selector(inAppBrowserWillOpen)]) {
-    [madDelegate inAppBrowserWillOpen];
-  }
-  
-    if (!self.inAppLandingPageController) {
-        self.inAppLandingPageController = [[InAppLandingPageController alloc] init];
+    [self stopTimer];
+    isExpanded = true;
+    
+    if ([madDelegate respondsToSelector:@selector(inAppBrowserWillOpen)]) {
+        [madDelegate inAppBrowserWillOpen];
     }
-
-  inAppLandingPageController.onClose =  @selector(inAppBrowserClosed);
-  inAppLandingPageController.ad = currentAd;
-  inAppLandingPageController.madvertise_view = self;
-  inAppLandingPageController.url = url;
-  
-  // there isn't a rootViewController defined, try to find one
-  if (!(self.rootViewController) && ([UIWindow instancesRespondToSelector:@selector(rootViewController)])) {
-    self.rootViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
-  }
-  
-  if (self.rootViewController) {
-    inAppLandingPageController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
-    if (self.rootViewController.modalViewController) {
-      [self.rootViewController.modalViewController presentModalViewController:inAppLandingPageController animated:YES];
-    }
-    else {
-      [self.rootViewController presentModalViewController:inAppLandingPageController animated:YES];
-    }
-  }
-  else {
-    [inAppLandingPageController.view setFrame:[[UIScreen mainScreen] applicationFrame]];
-    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationDuration:1.0];
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:window cache:YES];
-    [window addSubview:inAppLandingPageController.view];
-    [UIView commitAnimations];
-  }
+    
+    MPAdBrowserController *browser = [[MPAdBrowserController alloc] initWithURL:[NSURL URLWithString:url] delegate:self];
+    [[self viewControllerForPresentingModalView] presentModalViewController:browser animated:YES];
+    [browser release];
 }
 
 - (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)urlRequest navigationType:(UIWebViewNavigationType)navigationType {
-  NSURL *url = [urlRequest URL];
-  NSString *urlStr =   [url absoluteString];
+    NSURL *url = [urlRequest URL];
+    NSString *urlStr = [url absoluteString];
   
-  if ([urlStr isEqualToString:@"mad://close"]) { 
-    [currentView removeFromSuperview];
-    [self setUserInteractionEnabled:NO];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseRichMediaAdClosed" object:self];
-  } else if([urlStr rangeOfString:@"inappbrowser"].location != NSNotFound) {
-    [self openInAppBrowserWithUrl:urlStr];
-  } else if([urlStr rangeOfString:@"exitapp"].location != NSNotFound) {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
-  }
-  return YES;   
+    if ([urlStr isEqualToString:@"mad://close"]) { 
+        [currentView removeFromSuperview];
+        [self setUserInteractionEnabled:NO];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseRichMediaAdClosed" object:self];
+    } else if([urlStr rangeOfString:@"inappbrowser"].location != NSNotFound) {
+        [self openInAppBrowserWithUrl:urlStr];
+    } else if([urlStr rangeOfString:@"exitapp"].location != NSNotFound) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
+    }
+    return YES;   
 }
 
 - (void)swapView:(UIWebView*)newView oldView:(UIWebView*) oldView {
@@ -669,9 +614,6 @@ NSString * const MadvertiseAdClass_toString[] = {
     self.currentView = newView;
 }
 
-#pragma mark -
-#pragma mark MRAdViewControllerDelegate
-
 - (UIViewController *)viewControllerForPresentingModalView {
     for (UIView* next = [self superview]; next; next = next.superview) {
         UIResponder* nextResponder = [next nextResponder];
@@ -681,6 +623,9 @@ NSString * const MadvertiseAdClass_toString[] = {
     }
     return nil;
 }
+
+#pragma mark -
+#pragma mark MRAdViewControllerDelegate
 
 - (void)closeButtonPressed {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdClosed" object:nil];
@@ -765,11 +710,29 @@ NSString * const MadvertiseAdClass_toString[] = {
     }
 }
 
+#pragma mark -
+#pragma mark MPAdBrowserControllerDelegate
+
+- (void)dismissBrowserController:(MPAdBrowserController *)browserController {
+    [self dismissBrowserController:browserController animated:YES];
+}
+
+- (void)dismissBrowserController:(MPAdBrowserController *)browserController animated:(BOOL)animated {
+	[[self viewControllerForPresentingModalView] dismissModalViewControllerAnimated:animated];
+    
+    if ([madDelegate respondsToSelector:@selector(inAppBrowserClosed)]) {
+        [madDelegate inAppBrowserClosed];
+    }
+    
+    isExpanded = false;
+    [self createAdReloadTimer];
+}
+
 //////////////////////////////////////////
 // private methonds for internal use only
 //////////////////////////////////////////
 #pragma mark - private methods section
-- (CGSize) getParentViewDimensions{
+- (CGSize) getParentViewDimensions {
 
   if([self superview] != nil){
     UIView *parent = [self superview];
@@ -778,12 +741,12 @@ NSString * const MadvertiseAdClass_toString[] = {
   return CGSizeMake(0, 0);
 }
 
-- (CGSize) getScreenResolution{
+- (CGSize) getScreenResolution {
   CGRect screen     = [[UIScreen mainScreen] bounds];
   return CGSizeMake(screen.size.width, screen.size.height);
 }
 
-- (NSString*) getDeviceOrientation{
+- (NSString*) getDeviceOrientation {
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
   if(UIDeviceOrientationIsLandscape(orientation)){
     return @"landscape";

@@ -19,6 +19,7 @@
     NSString* bannerUrl;
     NSString* bannerType;
     NSString* richmediaUrl;
+    NSArray* trackingArray;
   
     NSString* text;
     bool isRichMedia;
@@ -34,6 +35,7 @@
 @property(nonatomic,retain) NSString *bannerType;
 @property(nonatomic,retain) NSString *richmediaUrl;
 @property(nonatomic,retain) NSString *text;
+@property(nonatomic,retain) NSArray *trackingArray;
 
 @property bool isRichMedia;
 @property bool isMraid;

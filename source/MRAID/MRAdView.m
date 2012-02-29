@@ -252,7 +252,7 @@ static NSString * const kMraidURLScheme = @"mraid";
     
     headTagRange = [mutableHTML rangeOfString:@"<head>"];
     [mutableHTML replaceCharactersInRange:headTagRange withString:
-    [NSString stringWithFormat:@"<head><script src='%@'></script>", @"http://dl.dropbox.com/u/44264257/MRAID_expandable/src/mraid.js"]];
+    [NSString stringWithFormat:@"<head><script src='%@'></script>", [mraidUrl absoluteString]]];
     
     return [mutableHTML autorelease];
 }

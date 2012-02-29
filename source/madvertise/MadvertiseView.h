@@ -22,12 +22,12 @@
 
 #import "MadvertiseUtilities.h"
 #import "MadvertiseAd.h"
-#import "InAppLandingPageController.h"
 #import "MadvertiseTracker.h"
 #import "MadvertiseDelegationProtocol.h"
 #import "JSONKit.h"
 #import "NSString+URLEncoding.h"
 #import "MRAdView.h"
+#import "MPAdBrowserController.h"
 
 // enum of available banner formats
 typedef enum tagMadvertiseAdClass {
@@ -43,25 +43,24 @@ typedef enum tagMadvertiseAdClass {
 @class InAppLandingPageController;
 @class MadvertiseAd;
 
-@interface MadvertiseView : UIView<UIWebViewDelegate> {
+@interface MadvertiseView : UIView<UIWebViewDelegate, MPAdBrowserControllerDelegate, MRAdViewDelegate> {
   
     // attributes
-    InAppLandingPageController* inAppLandingPageController;
     UIViewController *rootViewController;
     id<MadvertiseDelegationProtocol> madDelegate;           // the delegate which receives ad related events like: adLoaded or adLoadFailed
     NSMutableData* receivedData;                            // data received thorugh the connection to the ad server
     NSMutableURLRequest* request;  
     NSURLConnection *conn;                                  // current request object
   
-    MadvertiseAd* currentAd;                                          // current ad
+    MadvertiseAd* currentAd;                                // current ad
     MadvertiseAdClass currentAdClass;                       // ad type
     MRAdViewPlacementType placementType;
   
     NSInteger responseCode;                                 // flag that indicates if http response from ad server is ok
     bool isBannerMode;                                      // flag that indicates if the view shows a banner or a popup
-    bool isExpanded;
+    bool isExpanded;                                        // flag that indicates if there is an expanded ad action
   
-    UIWebView* currentView;                                    // one of the two views above, depending on user action
+    UIWebView* currentView;                                 // one of the two views above, depending on user action
   
     NSLock* lock;                                           // lock which is used to avoid race conditions while requesting an ad
 
@@ -80,7 +79,6 @@ typedef enum tagMadvertiseAdClass {
 @property (nonatomic, assign) id<MadvertiseDelegationProtocol> madDelegate;
 @property (nonatomic, assign) UIViewController *rootViewController;
 @property (nonatomic, retain) MadvertiseAd *currentAd;
-@property (nonatomic, retain) InAppLandingPageController* inAppLandingPageController;
 @property (nonatomic, retain) NSMutableURLRequest *request;
 @property (nonatomic, retain) UIWebView *currentView;
 @property (nonatomic, retain) NSTimer* timer;
@@ -88,10 +86,23 @@ typedef enum tagMadvertiseAdClass {
 @property (nonatomic, retain) NSMutableData* receivedData;
 
 
+- (CGSize) getScreenResolution;
+- (CGSize) getParentViewDimensions;
+- (NSString*) getDeviceOrientation;
+- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh;
+- (void) createAdReloadTimer;
+- (void) displayView;
+- (void) stopTimer;
+- (void)swapView:(UIView*)newView oldView:(UIView*) oldView;
+- (void)loadAd;
+- (void)openInAppBrowserWithUrl:(NSString*)url;
+
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) placementType secondsToRefresh:(int)secondsToRefresh;
 + (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate placementType:(MRAdViewPlacementType) placementType;
 + (void) handlerWithObserver:(id) observer AndSelector:(SEL) selector ForEvent:(NSString*) event;
 - (void)place_at_x:(int)x_pos y:(int)y_pos;               // position the frame for the view
-
+- (UIViewController *)viewControllerForPresentingModalView;
+- (void)dismissBrowserController:(MPAdBrowserController *)browserController;
+- (void)dismissBrowserController:(MPAdBrowserController *)browserController animated:(BOOL)animated;
 
 @end

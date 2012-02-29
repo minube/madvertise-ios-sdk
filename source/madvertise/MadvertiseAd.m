@@ -29,6 +29,7 @@
 @synthesize width;
 @synthesize height;
 @synthesize shouldOpenInAppBrowser;
+@synthesize trackingArray;
 
 -(MadvertiseAd*)initFromDictionary:(NSDictionary*)dictionary {
 
@@ -39,6 +40,9 @@
       text                    = [([dictionary objectForKey:@"text"] ?: @"") retain];
       hasBanner               = [[dictionary objectForKey:@"has_banner"] boolValue];
       shouldOpenInAppBrowser  = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
+      
+      trackingArray = [dictionary objectForKey:@"tracking"];
+      [trackingArray retain];
 
       width  = 320;
       height = 53;
@@ -84,6 +88,21 @@
   return self;
 }
 
+- (NSString*)trackingHtml {
+    if (!trackingArray) {
+        return @"";
+    }
+    
+    NSString* template = @"<img src='%@' width='1' height='1' alt=''>";
+    
+    NSString* result = @"";
+    for (NSString* trackingUrl in trackingArray) {
+        result = [result stringByAppendingString:[NSString stringWithFormat:template, trackingUrl]];
+    }
+    
+    return result;
+}
+
 - (NSString*)textAdToHtml {
   NSString* template = @""
   "<html>"
@@ -118,16 +137,17 @@
   "</head>"
   "<body>"
   "<div><p>%@</p><div class='madvertise'>ad by madvertise</div></div>"
+  "%@"
   "</body>"
   "</html>";
   int size = 28;
   if(self.text.length > 30) {
     size -= (self.text.length - 30) * 1.5;
   }
-  return [NSString stringWithFormat:template, size < 12 ? 12 : size, self.text];
+  return [NSString stringWithFormat:template, size < 12 ? 12 : size, self.text, [self trackingHtml]];
 }
 
--(NSString*)richmediaToHtml {
+- (NSString*)richmediaToHtml {
   NSString* template = @""
   "<html>"
   "<head>"
@@ -158,17 +178,18 @@
   "}, false );"
   "</script>"
   "<iframe id='main' src='%@' allowtransparency='true' width='320' height='480' seamless scrolling='no' style='z-index:10000; background:none;position: fixed;top: 0px;float:left;overflow: hidden !important;border: none !important;background-color: none !important;' />"
+  "%@"
   "</body>"
   "</html>";
 
-  return [NSString stringWithFormat:template, self.richmediaUrl];
+  return [NSString stringWithFormat:template, self.richmediaUrl, [self trackingHtml]];
 }
 
--(NSString*) mraidToHtnl {
-    return [NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl];
+- (NSString*) mraidToHtnl {
+    return [[NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl] stringByAppendingString:[self trackingHtml]];
 }
 
--(NSString*) to_html {
+- (NSString*) to_html {
     if (self.isRichMedia) {
       return [self richmediaToHtml];
     }
@@ -194,7 +215,7 @@
     NSString* body = @"";
 
     if (self.bannerUrl) {
-        body = [NSString stringWithFormat:@"<img src=\"%@\"></img>", self.bannerUrl];
+        body = [NSString stringWithFormat:@"<img src=\"%@\"></img>%@", self.bannerUrl, [self trackingHtml]];
     }
     
     return [NSString stringWithFormat:template, body];
@@ -206,6 +227,7 @@
     self.text = nil;
     self.bannerType = nil;
     self.richmediaUrl = nil;
+    self.trackingArray = nil;
 
     [super dealloc];
 }
