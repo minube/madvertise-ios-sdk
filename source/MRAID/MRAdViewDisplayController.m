@@ -160,33 +160,55 @@ static NSString *const kMovieWillExitNotification42 =
 #pragma mark - Close API
 
 - (void)close {
-    [_view adWillClose];
-    
     switch (_currentState) {
-        case MRAdViewStateDefault: 
+        case MRAdViewStateDefault:
+            [_view adWillHide];
             _currentState = MRAdViewStateHidden; 
             [_view fireChangeEventForProperty:
-             [MRStateProperty propertyWithState:_currentState]];
+            [MRStateProperty propertyWithState:_currentState]];
+            [_view adDidHide];
             break;
-        case MRAdViewStateExpanded: 
+        case MRAdViewStateExpanded:
+            [_view adWillClose];
             [self closeFromExpandedState];
+            [_view adDidClose];
             break;
     }
-             
-    [_view adDidClose];
 }
 
 #pragma mark - Close Helpers
 
 - (void)closeFromExpandedState {
-    _expansionContentView.usesCustomCloseButton = YES;
+    if ([_expansionContentView hideCloseButtinIndefaultState]) {
+        _expansionContentView.usesCustomCloseButton = YES;
+    }
     
     // Calculate the frame of our original parent view in the window coordinate space.
     UIWindow *keyWindow = MPKeyWindow();
     UIView *parentView = [keyWindow viewWithTag:_parentTag];
     _defaultFrameInKeyWindow = [parentView convertRect:_defaultFrame toView:keyWindow];
     
-    [self animateFromExpandedStateToDefaultState];
+    if (isFlipped) {
+        [self animateFromFlippedStateToDefaultState];
+    }
+    else {
+        [self animateFromExpandedStateToDefaultState];
+    }
+}
+
+- (void)animateFromFlippedStateToDefaultState {
+    [[self viewControllerForPresentingModalView] dismissModalViewControllerAnimated:YES];
+    _expansionContentView.frame = _defaultFrameInKeyWindow;
+    
+    [self moveViewFromWindowToDefaultSuperview];
+    self.view.frame = _defaultFrame;
+    if (_expansionContentView != self.view) [_expansionContentView removeFromSuperview];
+    
+    isFlipped = false;
+    _currentState = MRAdViewStateDefault;
+    [_view fireChangeEventForProperty:[MRStateProperty propertyWithState:_currentState]];
+    
+    [_view adDidDismissModalView];
 }
 
 - (void)animateFromExpandedStateToDefaultState {
@@ -216,6 +238,61 @@ shouldLockOrientation:(BOOL)shouldLockOrientation {
     [self useCustomClose:shouldUseCustomClose];
     [self expandToFrame:frame withURL:url blockingColor:[UIColor blackColor] 
         blockingOpacity:0.5 shouldLockOrientation:shouldLockOrientation];
+}
+
+- (void)flipToFrame:(CGRect)frame withURL:(NSURL *)url 
+       useCustomClose:(BOOL)shouldUseCustomClose isModal:(BOOL)isModal 
+shouldLockOrientation:(BOOL)shouldLockOrientation {
+    if (!_allowsExpansion) return;
+    [self useCustomClose:shouldUseCustomClose];
+    [self flipToFrame:frame withURL:url blockingColor:[UIColor blackColor] 
+        blockingOpacity:0.5 shouldLockOrientation:shouldLockOrientation];
+}
+
+- (void)flipToFrame:(CGRect)frame withURL:(NSURL *)url blockingColor:(UIColor *)blockingColor
+      blockingOpacity:(CGFloat)blockingOpacity shouldLockOrientation:(BOOL)shouldLockOrientation {
+    // Save our current frame as the default frame.
+    _defaultFrame = self.view.frame;
+    _expandedFrame = frame;
+    
+    [_view adWillExpandToFrame:frame];
+    [_view adWillPresentModalView];
+    
+    if (url) {
+        self.twoPartExpansionView = [[[MRAdView alloc] initWithFrame:self.view.frame 
+                                                     allowsExpansion:NO
+                                                    closeButtonStyle:MRAdViewCloseButtonStyleAdControlled 
+                                                       placementType:MRAdViewPlacementTypeInline] autorelease];
+        self.twoPartExpansionView.delegate = self;
+        [self.twoPartExpansionView loadCreativeFromURL:url];
+        
+        _expansionContentView = self.twoPartExpansionView;
+        
+        [self saveCurrentViewTransform];
+        [self applyRotationTransformForCurrentOrientationOnView:_expansionContentView];
+        [self assignRandomTagToDefaultSuperview];
+        
+        UIWindow *keyWindow = MPKeyWindow();
+        
+        _defaultFrameInKeyWindow = [self.view.superview convertRect:_defaultFrame toView:keyWindow];
+        _expansionContentView.frame = _defaultFrameInKeyWindow;
+        [keyWindow addSubview:_expansionContentView];
+        [self.view removeFromSuperview];
+    } else {
+        _expansionContentView = self.view;
+        [self moveViewFromDefaultSuperviewToWindow];
+    }
+    
+    UIViewController* flip = [[UIViewController alloc] init];
+    flip.view = _expansionContentView;
+    flip.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    [[self viewControllerForPresentingModalView] presentModalViewController:flip animated:YES];
+    [flip release];
+    
+    isFlipped = true;
+    _currentState = MRAdViewStateExpanded;
+    [_view fireChangeEventForProperty:[MRStateProperty propertyWithState:_currentState]];
+    [_view adDidExpandToFrame:frame];
 }
 
 - (void)expandToFrame:(CGRect)frame withURL:(NSURL *)url blockingColor:(UIColor *)blockingColor

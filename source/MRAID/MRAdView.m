@@ -44,6 +44,8 @@ static NSString * const kMraidURLScheme = @"mraid";
 - (void)adDidFailToLoad;
 - (void)adWillClose;
 - (void)adDidClose;
+- (void)adWillHide;
+- (void)adDidHide;
 - (void)adDidRequestCustomCloseEnabled:(BOOL)enabled;
 - (void)adWillExpandToFrame:(CGRect)frame;
 - (void)adDidExpandToFrame:(CGRect)frame;
@@ -113,6 +115,10 @@ static NSString * const kMraidURLScheme = @"mraid";
                                                               closeButtonStyle:style];
         
         [_closeButton addTarget:_displayController action:@selector(closeButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+        
+        if (![self hideCloseButtinIndefaultState]) {
+            [self layoutCloseButton];
+        }
     }
     return self;
 }
@@ -169,6 +175,7 @@ static NSString * const kMraidURLScheme = @"mraid";
 - (void)loadCreativeFromURL:(NSURL *)url {
     [_displayController revertViewToDefaultState];
     _isLoading = YES;
+    loadedUrl = url;
     [self loadRequest:[NSURLRequest requestWithURL:url]];
 }
 
@@ -215,6 +222,10 @@ static NSString * const kMraidURLScheme = @"mraid";
 
 - (void)fireNativeCommandCompleteEvent:(NSString *)command {
     [self executeJavascript:@"window.mraidbridge.nativeCallComplete('%@');", command];
+}
+
+- (bool)hideCloseButtinIndefaultState {
+    return _placementType == MRAdViewPlacementTypeInline;
 }
 
 #pragma mark - Private
@@ -343,7 +354,8 @@ static NSString * const kMraidURLScheme = @"mraid";
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     NSString *str = [[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding];
-    [self loadHTMLString:str baseURL:nil];
+    
+    [self loadHTMLString:str baseURL:loadedUrl];
     [str release];
 }
 
@@ -434,6 +446,18 @@ static NSString * const kMraidURLScheme = @"mraid";
     }
 }
 
+- (void)adWillHide {
+    if ([self.delegate respondsToSelector:@selector(adWillHide:)]) {
+        [self.delegate adWillHide:self];
+    }
+}
+
+- (void)adDidHide {
+    if ([self.delegate respondsToSelector:@selector(adDidHide:)]) {
+        [self.delegate adDidHide:self];
+    }
+}
+
 - (void)adDidClose {
     if ([self.delegate respondsToSelector:@selector(adDidClose:)]) {
         [self.delegate adDidClose:self];
@@ -471,6 +495,10 @@ static NSString * const kMraidURLScheme = @"mraid";
     _modalViewCount--;
     NSAssert((_modalViewCount >= 0), @"Modal view count cannot be negative.");
     if (_modalViewCount == 0) [self appShouldResume];
+    
+//    if (_placementType == MRAdViewPlacementTypeInterstitial) {
+//        [self layoutCloseButton];
+//    }
 }
 
 - (void)appShouldSuspend {

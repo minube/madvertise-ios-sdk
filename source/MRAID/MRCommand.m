@@ -148,7 +148,7 @@
     [self.view.displayController expandToFrame:newFrame 
                            withURL:url 
                     useCustomClose:[self boolFromParametersForKey:@"shouldUseCustomClose"]
-                           isModal:NO
+                           isModal:YES
              shouldLockOrientation:[self boolFromParametersForKey:@"lockOrientation"]];
     return YES;
 }
@@ -193,6 +193,40 @@
         [encodedURLString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]; 
     [self.view.browsingController openBrowserWithUrlString:URLString enableBack:YES 
                                                    enableForward:YES enableRefresh:YES];
+    return YES;
+}
+
+@end
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+@implementation MRFlipCommand
+
++ (void)load {
+    [MRCommand registerCommand:self];
+}
+
++ (NSString *)commandType {
+    return @"flip";
+}
+
+- (BOOL)execute {
+    CGRect applicationFrame = MPApplicationFrame();
+    CGFloat w = CGRectGetWidth(applicationFrame);
+    CGFloat h = CGRectGetHeight(applicationFrame);
+	
+	NSString *urlString = [self stringFromParametersForKey:@"url"];
+	NSURL *url = [NSURL URLWithString:urlString];
+    
+	MPLogDebug(@"Flipping; displaying %@.", url);
+    
+	CGRect newFrame = CGRectMake(applicationFrame.origin.x, applicationFrame.origin.y, w, h);
+    
+    [self.view.displayController flipToFrame:newFrame 
+                                       withURL:url 
+                                useCustomClose:[self boolFromParametersForKey:@"shouldUseCustomClose"]
+                                       isModal:NO
+                         shouldLockOrientation:[self boolFromParametersForKey:@"lockOrientation"]];
     return YES;
 }
 

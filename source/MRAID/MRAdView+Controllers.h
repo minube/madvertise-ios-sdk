@@ -21,6 +21,8 @@
 - (void)adDidFailToLoad;
 - (void)adWillClose;
 - (void)adDidClose;
+- (void)adWillHide;
+- (void)adDidHide;
 - (void)adDidRequestCustomCloseEnabled:(BOOL)enabled;
 - (void)adWillExpandToFrame:(CGRect)frame;
 - (void)adDidExpandToFrame:(CGRect)frame;

@@ -19,6 +19,7 @@
     NSString* bannerUrl;
     NSString* bannerType;
     NSString* richmediaUrl;
+    NSString* richmediaMarkup;
     NSArray* trackingArray;
   
     NSString* text;
@@ -27,18 +28,17 @@
     bool shouldOpenInAppBrowser;
     int width;
     int height;
-    bool isMraid;
 }
 
 @property(nonatomic,retain) NSString *clickUrl;
 @property(nonatomic,retain) NSString *bannerUrl;
 @property(nonatomic,retain) NSString *bannerType;
 @property(nonatomic,retain) NSString *richmediaUrl;
+@property(nonatomic,retain) NSString *richmediaMarkup;
 @property(nonatomic,retain) NSString *text;
 @property(nonatomic,retain) NSArray *trackingArray;
 
 @property bool isRichMedia;
-@property bool isMraid;
 @property bool hasBanner;
 @property bool shouldOpenInAppBrowser;
 @property int height;
@@ -48,5 +48,8 @@
 -(MadvertiseAd*)initFromDictionary:(NSDictionary*) dictionary;
 
 -(NSString*)to_html;
+
+-(Boolean)isLoadableViaUrl;
+- (NSURL*)url;
 
 @end

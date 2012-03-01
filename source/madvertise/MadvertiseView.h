@@ -46,7 +46,6 @@ typedef enum tagMadvertiseAdClass {
 @interface MadvertiseView : UIView<UIWebViewDelegate, MPAdBrowserControllerDelegate, MRAdViewDelegate> {
   
     // attributes
-    UIViewController *rootViewController;
     id<MadvertiseDelegationProtocol> madDelegate;           // the delegate which receives ad related events like: adLoaded or adLoadFailed
     NSMutableData* receivedData;                            // data received thorugh the connection to the ad server
     NSMutableURLRequest* request;  
@@ -89,7 +88,7 @@ typedef enum tagMadvertiseAdClass {
 - (CGSize) getScreenResolution;
 - (CGSize) getParentViewDimensions;
 - (NSString*) getDeviceOrientation;
-- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh;
+- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh;
 - (void) createAdReloadTimer;
 - (void) displayView;
 - (void) stopTimer;
@@ -97,8 +96,8 @@ typedef enum tagMadvertiseAdClass {
 - (void)loadAd;
 - (void)openInAppBrowserWithUrl:(NSString*)url;
 
-+ (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) placementType secondsToRefresh:(int)secondsToRefresh;
-+ (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate placementType:(MRAdViewPlacementType) placementType;
++ (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh;
++ (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate;
 + (void) handlerWithObserver:(id) observer AndSelector:(SEL) selector ForEvent:(NSString*) event;
 - (void)place_at_x:(int)x_pos y:(int)y_pos;               // position the frame for the view
 - (UIViewController *)viewControllerForPresentingModalView;

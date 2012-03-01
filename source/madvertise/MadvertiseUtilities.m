@@ -16,9 +16,8 @@
 #import "MadvertiseUtilities.h"
 
 NSString* UserAgentString() {
-	//static NSString *userAgent = nil;
-    static NSString *userAgent = @"Mozilla/5.0 (iPhone; U; CPU like Mac OS X; nb-no) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1C28 Safari/419.3";
-	
+	static NSString *userAgent = nil;
+    
     if (!userAgent) {
         UIWebView *webview = [[UIWebView alloc] init];
         userAgent = [[webview stringByEvaluatingJavaScriptFromString:@"navigator.userAgent"] copy];  

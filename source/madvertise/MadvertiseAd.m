@@ -20,12 +20,12 @@
 
 @synthesize bannerType;
 @synthesize richmediaUrl;
+@synthesize richmediaMarkup;
 @synthesize bannerUrl;
 @synthesize clickUrl;
 @synthesize text;
 @synthesize hasBanner;
 @synthesize isRichMedia;
-@synthesize isMraid;
 @synthesize width;
 @synthesize height;
 @synthesize shouldOpenInAppBrowser;
@@ -50,26 +50,13 @@
       if (hasBanner) {
           bannerUrl    = [[[dictionary objectForKey:@"banner"] objectForKey:@"url"] retain];
           bannerType   = [[[dictionary objectForKey:@"banner"] objectForKey:@"type"] retain];
-          isMraid      = [[[dictionary objectForKey:@"banner"] objectForKey:@"mraid"] boolValue];
           
-          // get mraid size
-          if (isMraid) {
-              id w = [dictionary objectForKey:@"ad_width"];
-              if (w) {
-                  width = [w intValue];
-              }
-              
-              id h = [dictionary objectForKey:@"ad_height"];
-              if (h) {
-                  height = [h intValue];
-              }
-          }
-        
           // could be rich media
           if ([bannerType isEqualToString:@"rich_media"]) {
               isRichMedia = YES;
               NSDictionary* rm = [[dictionary objectForKey:@"banner"] objectForKey:@"rich_media"];
               richmediaUrl = [[rm objectForKey:@"full_url"] retain];
+              richmediaMarkup = [[rm objectForKey:@"markup"] retain];
         
               id w = [rm objectForKey:@"width"];
               if (w) {
@@ -166,7 +153,7 @@
   "    if(event.data == 'madvertise.ad.close') {"
   "      var d = document.getElementById('main');"
   "      if(d) d.parentNode.removeChild(d);"
-  "      window.location = 'mad://close';"
+  "      window.location = 'mraid://close';"
   "    }"
   "  } else {"
   "    if(event.data.type == 'madvertise.ad.redirect') {"
@@ -191,11 +178,13 @@
 
 - (NSString*) to_html {
     if (self.isRichMedia) {
-      return [self richmediaToHtml];
-    }
-    
-    if (self.isMraid) {
-        return [self mraidToHtnl];
+        if (bannerUrl) {
+            return [self richmediaToHtml];
+            return [self mraidToHtnl];
+        }
+        else {
+            return [self richmediaToHtml];
+        }
     }
     
     if (!self.hasBanner) {
@@ -221,12 +210,21 @@
     return [NSString stringWithFormat:template, body];
 }
 
+- (Boolean)isLoadableViaUrl {    
+    return (self.isRichMedia && self.richmediaUrl);
+}
+
+- (NSURL*)url {
+    return [NSURL URLWithString:self.richmediaUrl];
+}
+
 - (void)dealloc {
     self.clickUrl = nil;
     self.bannerUrl = nil;
     self.text = nil;
     self.bannerType = nil;
     self.richmediaUrl = nil;
+    self.richmediaMarkup = nil;
     self.trackingArray = nil;
 
     [super dealloc];

@@ -24,7 +24,6 @@
 @synthesize conn;
 @synthesize receivedData;
 @synthesize madDelegate;
-@synthesize rootViewController;
 
 NSString * const MadvertiseAdClass_toString[] = {
   @"mma",
@@ -47,7 +46,6 @@ NSString * const MadvertiseAdClass_toString[] = {
   self.conn = nil;
   self.request = nil;
   self.receivedData = nil;
-  self.rootViewController = nil;
 
   if (self.timer) {
     [self stopTimer];
@@ -74,12 +72,12 @@ NSString * const MadvertiseAdClass_toString[] = {
   [super dealloc];
 }
 
-+ (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate placementType:(MRAdViewPlacementType) placementType {
-  return [self loadAdWithDelegate:delegate withClass:MadvertiseAdClassRichMedia placementType:placementType secondsToRefresh:-1];
++ (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate {
+  return [self loadAdWithDelegate:delegate withClass:MadvertiseAdClassRichMedia placementType:MRAdViewPlacementTypeInterstitial secondsToRefresh:-1];
 }
 
 // main-constructor
-+ (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) placementType secondsToRefresh:(int)secondsToRefresh {
++ (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
   BOOL enableDebug = NO;
 
 #ifdef DEBUG
@@ -105,7 +103,7 @@ NSString * const MadvertiseAdClass_toString[] = {
       secondsToRefresh = -1;
   }
     
-  return [[[MadvertiseView alloc] initWithDelegate:delegate withClass:adClassValue secondsToRefresh:secondsToRefresh] autorelease];
+    return [[[MadvertiseView alloc] initWithDelegate:delegate withClass:adClassValue placementType:type secondsToRefresh:secondsToRefresh] autorelease];
 }
 
 + (void) handlerWithObserver:(id) observer AndSelector:(SEL) selector ForEvent:(NSString*) event {
@@ -145,7 +143,7 @@ NSString * const MadvertiseAdClass_toString[] = {
 }
 
 // helper method for initialization
-- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh {
+- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
 
   if ((self = [super init])) {
     MadLog(@"madvertise SDK %@", MADVERTISE_SDK_VERION);
@@ -167,6 +165,7 @@ NSString * const MadvertiseAdClass_toString[] = {
     timer               = nil;
       
     isExpanded = false;
+    placementType = type;
 
     madDelegate  = delegate;
 
@@ -235,33 +234,31 @@ NSString * const MadvertiseAdClass_toString[] = {
         self.currentAd = [[[MadvertiseAd alloc] initFromDictionary:dictionary] autorelease];
 
         // banner formats
-        if (!self.currentAd.isMraid) {
-            if (currentAdClass == MadvertiseAdClassMediumRectangle) {
-                currentAd.width   = 300;
-                currentAd.height  = 250;
-            } else if (currentAdClass == MadvertiseAdClassMMA) {
-                currentAd.width   = 320;
-                currentAd.height  = 53;
-            } else if (currentAdClass == MadvertiseAdClassLeaderboard){
-                currentAd.width   = 728;
-                currentAd.height  = 90;
-            } else if (currentAdClass == MadvertiseAdClassFullscreen){
-                currentAd.width   = 768;
-                currentAd.height  = 768;
-            } else if (currentAdClass == MadvertiseAdClassPortrait){
-                currentAd.width   = 766;
-                currentAd.height  = 66;
-            } else if (currentAdClass == MadvertiseAdClassLandscape){
-                currentAd.width   = 1024;
-                currentAd.height  = 66;
-            } else if (currentAdClass == MadvertiseAdClassRichMedia) {
-                CGRect screen     = [[UIScreen mainScreen] bounds];
-                currentAd.height  = screen.size.height;
-                currentAd.width   =  screen.size.width;
-                } 
-            }
+        if (currentAdClass == MadvertiseAdClassMediumRectangle) {
+            currentAd.width   = 300;
+            currentAd.height  = 250;
+        } else if (currentAdClass == MadvertiseAdClassMMA) {
+            currentAd.width   = 320;
+            currentAd.height  = 53;
+        } else if (currentAdClass == MadvertiseAdClassLeaderboard){
+            currentAd.width   = 728;
+            currentAd.height  = 90;
+        } else if (currentAdClass == MadvertiseAdClassFullscreen){
+            currentAd.width   = 768;
+            currentAd.height  = 768;
+        } else if (currentAdClass == MadvertiseAdClassPortrait){
+            currentAd.width   = 766;
+            currentAd.height  = 66;
+        } else if (currentAdClass == MadvertiseAdClassLandscape){
+            currentAd.width   = 1024;
+            currentAd.height  = 66;
+        } else if (currentAdClass == MadvertiseAdClassRichMedia) {
+            CGRect screen     = [[UIScreen mainScreen] bounds];
+            currentAd.height  = screen.size.height;
+            currentAd.width   =  screen.size.width;
+        } 
       
-            [self displayView];
+        [self displayView];
     } else if (!isExpanded) {
         // dispatch status notification
         [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:[NSNumber numberWithInt:responseCode]];
@@ -470,33 +467,38 @@ NSString * const MadvertiseAdClass_toString[] = {
     
     [self setUserInteractionEnabled:YES];
 
-    self.frame = CGRectMake(x, y , currentAd.width, currentAd.height);
-    UIWebView* view = nil;
+    self.frame = CGRectMake(x, y , [currentAd width], [currentAd height]);
     
-    if ([currentAd isMraid]) {        
-        MRAdView *mraidView = [[MRAdView alloc] initWithFrame:CGRectMake(0, 0, [currentAd width], [currentAd height]) 
+    CGRect frame = CGRectMake(0, 0, [currentAd width], [currentAd height]);
+    if ([currentAd isRichMedia]) {
+        // fullscreen ad
+        if (currentAdClass == MadvertiseAdClassRichMedia) {
+            CGRect screen = [[UIScreen mainScreen] bounds];
+            frame = CGRectMake(0, 0, screen.size.width, screen.size.height);
+        }
+        
+        MRAdView *mraidView = [[MRAdView alloc] initWithFrame:frame 
                                                 allowsExpansion:YES
                                                 closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
                                                 placementType:placementType];
         mraidView.delegate = self;
-        [mraidView loadCreativeWithHTMLString:[currentAd to_html] baseURL:nil];
+        
+        if ([currentAd isLoadableViaUrl]) {
+            [mraidView loadCreativeFromURL:[currentAd url]];
+        }
+        else {
+            [mraidView loadCreativeWithHTMLString:[currentAd to_html] baseURL:nil];
+        }
     }
     else {
-        view = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0 , currentAd.width, currentAd.height)];
-        
-        if (currentAdClass == MadvertiseAdClassRichMedia) {
-            view.opaque = NO;
-            view.backgroundColor = [UIColor clearColor];
-            [view setUserInteractionEnabled:YES];
-        } else {
-            [view setUserInteractionEnabled:NO];
-        }
+        UIWebView* view = [[UIWebView alloc] initWithFrame:frame];
+        [view setUserInteractionEnabled:NO];
         
         view.delegate = self;
         [view loadHTMLString:[currentAd to_html] baseURL:nil];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
 }
 
 
@@ -517,15 +519,12 @@ NSString * const MadvertiseAdClass_toString[] = {
     NSURL *url = [urlRequest URL];
     NSString *urlStr = [url absoluteString];
   
-    if ([urlStr isEqualToString:@"mad://close"]) { 
-        [currentView removeFromSuperview];
-        [self setUserInteractionEnabled:NO];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseRichMediaAdClosed" object:self];
-    } else if([urlStr rangeOfString:@"inappbrowser"].location != NSNotFound) {
+    if ([urlStr rangeOfString:@"inappbrowser"].location != NSNotFound) {
         [self openInAppBrowserWithUrl:urlStr];
-    } else if([urlStr rangeOfString:@"exitapp"].location != NSNotFound) {
+    } else if ([urlStr rangeOfString:@"exitapp"].location != NSNotFound) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
     }
+    
     return YES;   
 }
 
@@ -634,17 +633,10 @@ NSString * const MadvertiseAdClass_toString[] = {
 - (void)adDidLoad:(MRAdView *)adView {
     [self swapView:adView oldView:currentView];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
-    
-    // madvertise notification stuff
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:nil];
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:adView];
-    
-    // madvertise notification stuff
-    MadLog(@"Failed to receive MRAID ad");
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:[NSNumber numberWithInt:responseCode]];
 }
 
 - (void)appShouldSuspendForAd:(MRAdView *)adView {
@@ -678,6 +670,11 @@ NSString * const MadvertiseAdClass_toString[] = {
 
 // Called just after the ad has been hidden.
 - (void)adDidHide:(MRAdView *)adView {
+    [self stopTimer];
+    isExpanded = true;
+    
+    self.frame = CGRectMake(x, y , 0, 0);
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidHide" object:adView];
 }
 

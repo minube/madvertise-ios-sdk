@@ -29,6 +29,8 @@
     // Indicates whether any part of the ad is visible on-screen.
     BOOL _isViewable;
     
+    BOOL isFlipped;
+    
     // Variables for resizable ads.
     CGSize _maxSize;
     
@@ -52,6 +54,9 @@
 - (void)revertViewToDefaultState;
 - (void)close;
 - (void)expandToFrame:(CGRect)frame withURL:(NSURL *)url 
+       useCustomClose:(BOOL)shouldUseCustomClose isModal:(BOOL)isModal 
+shouldLockOrientation:(BOOL)shouldLockOrientation;
+- (void)flipToFrame:(CGRect)frame withURL:(NSURL *)url 
        useCustomClose:(BOOL)shouldUseCustomClose isModal:(BOOL)isModal 
 shouldLockOrientation:(BOOL)shouldLockOrientation;
 - (void)expandToFrame:(CGRect)frame withURL:(NSURL *)url blockingColor:(UIColor *)blockingColor

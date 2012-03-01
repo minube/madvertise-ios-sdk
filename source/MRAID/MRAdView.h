@@ -70,6 +70,8 @@ typedef NSUInteger MRAdViewCloseButtonStyle;
     
     // Enum indicating whether this view is being used as an inline ad or an interstitial ad.
     MRAdViewPlacementType _placementType;
+    
+    NSURL* loadedUrl;
 }
 
 @property (nonatomic, assign) id<MRAdViewDelegate> delegate;
@@ -84,6 +86,7 @@ typedef NSUInteger MRAdViewCloseButtonStyle;
 - (NSString *)executeJavascript:(NSString *)javascript, ...;
 - (BOOL)isViewable;
 - (void)rotateToOrientation:(UIInterfaceOrientation)newOrientation;
+- (bool)hideCloseButtinIndefaultState;
 
 @end
 
