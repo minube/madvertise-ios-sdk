@@ -20,7 +20,6 @@
 #pragma mark MadvertiseDelegateProtocol Methods
 
 - (NSString *) appId {
-//    return @"response-ios.json";
     return @"TestTokn";
 }
 
@@ -54,7 +53,7 @@
 }
 
 - (BOOL) richMediaDisabled {
-    return YES;
+    return NO;
 }
 
 //- (NSString*) adServer {
