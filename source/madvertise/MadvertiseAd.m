@@ -69,6 +69,27 @@
               }
           } else {
               isRichMedia = NO;
+              
+              // banner formats
+              if ([bannerType isEqualToString:@"medium_rectangle"]) {
+                  width   = 300;
+                  height  = 250;
+              } else if ([bannerType isEqualToString:@"mma"]) {
+                  width   = 320;
+                  height  = 53;
+              } else if ([bannerType isEqualToString:@"leaderboard"]){
+                  width   = 728;
+                  height  = 90;
+              } else if ([bannerType isEqualToString:@"fullscreen"]){
+                  width   = 768;
+                  height  = 768;
+              } else if ([bannerType isEqualToString:@"portrait"]){
+                  width   = 766;
+                  height  = 66;
+              } else if ([bannerType isEqualToString:@"landscape"]){
+                  width   = 1024;
+                  height  = 66;
+              }
           }
       }
   }
@@ -134,57 +155,13 @@
   return [NSString stringWithFormat:template, size < 12 ? 12 : size, self.text, [self trackingHtml]];
 }
 
-- (NSString*)richmediaToHtml {
-  NSString* template = @""
-  "<html>"
-  "<head>"
-  "<style type=\"text/css\">"
-  "body {"
-  "  margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; text-align:center; border:none;"
-  "overflow: hidden;"                                                                                                 
-  "background-color: transparent !important;"
-  "}"
-  "</style>"
-  "</head>"
-  "<body>"   
-  "<script>"
-  "window.addEventListener('message', function( event ) {"
-  "  if(typeof(event.data) == 'string') {"
-  "    if(event.data == 'madvertise.ad.close') {"
-  "      var d = document.getElementById('main');"
-  "      if(d) d.parentNode.removeChild(d);"
-  "      window.location = 'mraid://close';"
-  "    }"
-  "  } else {"
-  "    if(event.data.type == 'madvertise.ad.redirect') {"
-  "      setTimeout(function() {"
-  "        window.location = event.data.data;"
-  "      }, 500);"
-  "    }"
-  "  }"
-  "}, false );"
-  "</script>"
-  "<iframe id='main' src='%@' allowtransparency='true' width='320' height='480' seamless scrolling='no' style='z-index:10000; background:none;position: fixed;top: 0px;float:left;overflow: hidden !important;border: none !important;background-color: none !important;' />"
-  "%@"
-  "</body>"
-  "</html>";
-
-  return [NSString stringWithFormat:template, self.richmediaUrl, [self trackingHtml]];
-}
-
 - (NSString*) mraidToHtnl {
     return [[NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl] stringByAppendingString:[self trackingHtml]];
 }
 
 - (NSString*) to_html {
     if (self.isRichMedia) {
-        if (bannerUrl) {
-            return [self richmediaToHtml];
-            return [self mraidToHtnl];
-        }
-        else {
-            return [self richmediaToHtml];
-        }
+        return [self mraidToHtnl];
     }
     
     if (!self.hasBanner) {

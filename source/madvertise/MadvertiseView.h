@@ -76,7 +76,6 @@ typedef enum tagMadvertiseAdClass {
 ////////////////
 
 @property (nonatomic, assign) id<MadvertiseDelegationProtocol> madDelegate;
-@property (nonatomic, assign) UIViewController *rootViewController;
 @property (nonatomic, retain) MadvertiseAd *currentAd;
 @property (nonatomic, retain) NSMutableURLRequest *request;
 @property (nonatomic, retain) UIWebView *currentView;

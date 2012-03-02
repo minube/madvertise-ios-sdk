@@ -151,7 +151,7 @@ NSString * const MadvertiseAdClass_toString[] = {
     self.clipsToBounds = YES;
 
     // just a dummy placeholder
-    self.currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0, 0,0)];
+    self.currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     [self addSubview: self.currentView];
     [currentView release];
     
@@ -232,31 +232,12 @@ NSString * const MadvertiseAdClass_toString[] = {
 
         MadLog(@"Creating ad");
         self.currentAd = [[[MadvertiseAd alloc] initFromDictionary:dictionary] autorelease];
-
-        // banner formats
-        if (currentAdClass == MadvertiseAdClassMediumRectangle) {
-            currentAd.width   = 300;
-            currentAd.height  = 250;
-        } else if (currentAdClass == MadvertiseAdClassMMA) {
-            currentAd.width   = 320;
-            currentAd.height  = 53;
-        } else if (currentAdClass == MadvertiseAdClassLeaderboard){
-            currentAd.width   = 728;
-            currentAd.height  = 90;
-        } else if (currentAdClass == MadvertiseAdClassFullscreen){
-            currentAd.width   = 768;
-            currentAd.height  = 768;
-        } else if (currentAdClass == MadvertiseAdClassPortrait){
-            currentAd.width   = 766;
-            currentAd.height  = 66;
-        } else if (currentAdClass == MadvertiseAdClassLandscape){
-            currentAd.width   = 1024;
-            currentAd.height  = 66;
-        } else if (currentAdClass == MadvertiseAdClassRichMedia) {
+        
+        if (currentAdClass == MadvertiseAdClassRichMedia) {
             CGRect screen     = [[UIScreen mainScreen] bounds];
             currentAd.height  = screen.size.height;
             currentAd.width   =  screen.size.width;
-        } 
+        }
       
         [self displayView];
     } else if (!isExpanded) {
@@ -287,7 +268,7 @@ NSString * const MadvertiseAdClass_toString[] = {
   if(madDelegate != nil && [madDelegate respondsToSelector:@selector(adServer)]) {
     server_url = [madDelegate adServer];
   }
-  MadLog(@"Using url: %@",server_url);
+  MadLog(@"Using url: %@", server_url);
 
   // always supported request parameter //
   if (madDelegate == nil || ![madDelegate respondsToSelector:@selector(appId)]) {
@@ -372,7 +353,10 @@ NSString * const MadvertiseAdClass_toString[] = {
     [post_params setValue: [MadvertiseUtilities getTimestamp]         forKey:MADVERTISE_TIMESTAMP_KEY];
     [post_params setValue: MadvertiseAdClass_toString[currentAdClass] forKey:MADVERTISE_BANNER_TYPE_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
-    [post_params setValue: @"true"                                    forKey:MADVERTISE_MRAID_KEY];
+    
+    if (!([madDelegate respondsToSelector:@selector(richMediaDisabled)] && [madDelegate richMediaDisabled])) {
+        [post_params setValue: @"true"                                forKey:MADVERTISE_MRAID_KEY];
+    }
 
     NSString *body = @"";
     unsigned int n = 0;

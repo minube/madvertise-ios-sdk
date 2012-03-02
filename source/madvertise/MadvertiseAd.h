@@ -45,11 +45,9 @@
 @property int width;
 
 
--(MadvertiseAd*)initFromDictionary:(NSDictionary*) dictionary;
-
--(NSString*)to_html;
-
--(Boolean)isLoadableViaUrl;
+- (MadvertiseAd*)initFromDictionary:(NSDictionary*) dictionary;
+- (NSString*)to_html;
+- (Boolean)isLoadableViaUrl;
 - (NSURL*)url;
 
 @end

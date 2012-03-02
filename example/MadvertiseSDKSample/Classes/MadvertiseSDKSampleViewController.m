@@ -67,8 +67,8 @@ MadvertiseView *ad;
     } else {
         /* run something specific for the iPhone */
         
-//        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
-        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+//        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
     }
     
     [ad place_at_x:0 y:0];
@@ -80,7 +80,6 @@ MadvertiseView *ad;
     //observing adLoaded, adLoadFailed and adRichMediaClose Events
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:) ForEvent:@"MadvertiseAdLoaded"];
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:) ForEvent:@"MadvertiseAdLoadFailed"];
-    [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdClose:) ForEvent:@"MadvertiseRichMediaAdClosed"];
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -101,14 +100,6 @@ MadvertiseView *ad;
 
 - (void) onAdLoadedFailed:(NSNotification*)notify {
     MadLog(@"ad load faild with code: %@",[notify object]);
-}
-- (void) onAdClose:(NSNotification*)notify{
-    // can occure for rich media ads which do not refresh automatically
-    MadLog(@"ad was closed");
-    if (ad) {
-        [ad removeFromSuperview];
-    }
-    ad = nil; 
 }
 
 

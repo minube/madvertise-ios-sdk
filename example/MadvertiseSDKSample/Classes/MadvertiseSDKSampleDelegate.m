@@ -53,6 +53,10 @@
   return @"M";
 }
 
+- (BOOL) richMediaDisabled {
+    return YES;
+}
+
 //- (NSString*) adServer {
 ////    return @"http://localhost:9292";
 //    return @"http://dl.dropbox.com/u/44264257";

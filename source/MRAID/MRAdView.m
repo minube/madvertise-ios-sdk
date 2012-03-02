@@ -25,7 +25,6 @@ static NSString * const kMraidURLScheme = @"mraid";
 
 - (void)loadRequest:(NSURLRequest *)request;
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL;
-- (NSMutableString *)HTMLWithJavaScriptBridge:(NSString *)HTML;
 - (void)convertFragmentToFullPayload:(NSMutableString *)fragment;
 - (NSString *)executeJavascript:(NSString *)javascript withVarArgs:(va_list)args;
 - (BOOL)isOnscreen;
@@ -238,34 +237,19 @@ static NSString * const kMraidURLScheme = @"mraid";
 }
 
 - (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)baseURL {
-    NSString *HTML = [self HTMLWithJavaScriptBridge:string];
-    [_webView loadHTMLString:HTML baseURL:baseURL];
+    NSString *mraidBundlePath = [[NSBundle mainBundle] pathForResource:@"MRAID" ofType:@"bundle"];
+    NSBundle *mraidBundle = [NSBundle bundleWithPath:mraidBundlePath];
+    NSString *mraidPath = [mraidBundle pathForResource:@"mraid" ofType:@"js"];
+    NSString *mraidString = [NSString stringWithContentsOfFile:mraidPath encoding:NSUTF8StringEncoding error:nil];
+    
+    [_webView stringByEvaluatingJavaScriptFromString:mraidString];
+    [_webView loadHTMLString:string baseURL:baseURL];
 }
 
 - (BOOL)isOnscreen {
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     CGRect frameInWindowCoordinates = [self.superview convertRect:self.frame toView:keyWindow];
     return CGRectIntersectsRect(frameInWindowCoordinates, keyWindow.frame);
-}
-
-- (NSMutableString *)HTMLWithJavaScriptBridge:(NSString *)HTML {
-    NSRange htmlTagRange = [HTML rangeOfString:@"<html>"];
-    NSRange headTagRange = [HTML rangeOfString:@"<head>"];
-    BOOL isFragment = (htmlTagRange.location == NSNotFound || headTagRange.location == NSNotFound);
-    
-    NSMutableString *mutableHTML = [HTML mutableCopy];
-    if (isFragment) [self convertFragmentToFullPayload:mutableHTML];
-
-    NSString *mraidBundlePath = [[NSBundle mainBundle] pathForResource:@"MRAID" ofType:@"bundle"];
-    NSBundle *mraidBundle = [NSBundle bundleWithPath:mraidBundlePath];
-    NSString *mraidPath = [mraidBundle pathForResource:@"mraid" ofType:@"js"];
-    NSURL *mraidUrl = [NSURL fileURLWithPath:mraidPath];
-    
-    headTagRange = [mutableHTML rangeOfString:@"<head>"];
-    [mutableHTML replaceCharactersInRange:headTagRange withString:
-    [NSString stringWithFormat:@"<head><script src='%@'></script>", [mraidUrl absoluteString]]];
-    
-    return [mutableHTML autorelease];
 }
 
 - (void)convertFragmentToFullPayload:(NSMutableString *)fragment {
@@ -280,6 +264,8 @@ static NSString * const kMraidURLScheme = @"mraid";
 
 - (NSString *)executeJavascript:(NSString *)javascript withVarArgs:(va_list)args {
     NSString *js = [[[NSString alloc] initWithFormat:javascript arguments:args] autorelease];
+    
+    NSLog(@"%@", js);
     return [_webView stringByEvaluatingJavaScriptFromString:js];
 }
 
@@ -366,6 +352,8 @@ static NSString * const kMraidURLScheme = @"mraid";
     NSURL *url = [request URL];
     NSMutableString *urlString = [NSMutableString stringWithString:[url absoluteString]];
     NSString *scheme = url.scheme;
+    
+    NSLog(@"%@", urlString);
     
     if ([scheme isEqualToString:kMraidURLScheme]) {
         MPLogDebug(@"Trying to process command: %@", urlString);
@@ -495,10 +483,6 @@ static NSString * const kMraidURLScheme = @"mraid";
     _modalViewCount--;
     NSAssert((_modalViewCount >= 0), @"Modal view count cannot be negative.");
     if (_modalViewCount == 0) [self appShouldResume];
-    
-//    if (_placementType == MRAdViewPlacementTypeInterstitial) {
-//        [self layoutCloseButton];
-//    }
 }
 
 - (void)appShouldSuspend {
