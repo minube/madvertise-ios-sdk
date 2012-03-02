@@ -649,14 +649,13 @@ NSString * const MadvertiseAdClass_toString[] = {
 
 // Called just before the ad is hidden.
 - (void)adWillHide:(MRAdView *)adView {
+    [self stopTimer];
+    isExpanded = true;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillHide" object:adView];
 }
 
 // Called just after the ad has been hidden.
-- (void)adDidHide:(MRAdView *)adView {
-    [self stopTimer];
-    isExpanded = true;
-    
+- (void)adDidHide:(MRAdView *)adView {    
     self.frame = CGRectMake(x, y , 0, 0);
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidHide" object:adView];
@@ -664,11 +663,15 @@ NSString * const MadvertiseAdClass_toString[] = {
 
 // Called just before the ad expands.
 - (void)willExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
+    [self stopTimer];
+    isExpanded = true;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillExpand" object:adView];
 }
 
 // Called just after the ad has expanded.
 - (void)didExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
+    [self stopTimer];
+    isExpanded = true;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidExpand" object:adView];
 }
 
