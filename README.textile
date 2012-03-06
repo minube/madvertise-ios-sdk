@@ -1,14 +1,14 @@
-h1. madvertise iOS SDK
+h1. madvertise iOS SDK (Version 5.0.0)
 
 h2. Intro
 
-The madvertise iOS SDK lets you monetize your iOS apps via advertising. Basically, the code sends http requests to the madvertise ad server and displays banner ads in various formats. You will receive 100 % of click generated revenues, as we commited to in our [developer fund](http://www.madvertise-fund.com/).
+The madvertise iOS SDK lets you monetize your iOS apps via advertising. Basically, the code sends http requests to the madvertise ad server and displays banner and rich media ads in various formats.
 
 It supports different banner sizes (mma, medium_rectangle, portrait, landscape, fullscreen, leaderboard), ad rotation, in-app landing pages, animated roll-over effects, etc. ...
 
 h2. License
 
-The iOS SDK is using TouchJSON, a library for parsing JSON data (https://github.com/TouchCode/TouchJSON), which is published under the MIT License (http://www.opensource.org/licenses/mit-license.php).
+The iOS SDK is using JSONKit, a library for parsing JSON data (https://github.com/johnezang/JSONKit), which is published under the BSD License, or alternatively under the terms of the Apache License, Version 2.0. Parts of the MRaid implementation are based on the MoPub iOS SDK and is published under the New BSD License.
 
 All other code is published under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
 
@@ -59,6 +59,11 @@ This is why madvertise decided to make all SDKs public as open source projects. 
 
 
 h2. Change log
+
+v5.0.0
+
+* new landing page browser
+* MRaid 1.0 compatibility
 
 v4.2.0
 

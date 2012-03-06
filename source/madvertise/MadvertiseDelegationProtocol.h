@@ -39,7 +39,7 @@ typedef enum tagMadvertiseAnimationClass {
 - (void) inAppBrowserWillOpen;                      // YES | NO
 - (void) inAppBrowserClosed;                        // YES | NO
 - (BOOL) debugEnabled;                              // YES | NO
-- (BOOL) richMediaDisabled;                         // YES | NO
+- (BOOL) mRaidDisabled;                             // YES | NO
 - (BOOL) downloadTrackerEnabled;                    // YES | NO
 - (NSString *) adServer;                            // default server is ad.madvertise.de.
 - (CLLocationCoordinate2D) location;

@@ -76,6 +76,10 @@ NSString * const MadvertiseAdClass_toString[] = {
   return [self loadAdWithDelegate:delegate withClass:MadvertiseAdClassRichMedia placementType:MRAdViewPlacementTypeInterstitial secondsToRefresh:-1];
 }
 
++ (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh {
+    return [self loadAdWithDelegate:delegate withClass:adClassValue placementType:MRAdViewPlacementTypeInline secondsToRefresh:secondsToRefresh];
+}
+
 // main-constructor
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
   BOOL enableDebug = NO;
@@ -354,7 +358,7 @@ NSString * const MadvertiseAdClass_toString[] = {
     [post_params setValue: MadvertiseAdClass_toString[currentAdClass] forKey:MADVERTISE_BANNER_TYPE_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
     
-    if (!([madDelegate respondsToSelector:@selector(richMediaDisabled)] && [madDelegate richMediaDisabled])) {
+    if (!([madDelegate respondsToSelector:@selector(mRaidDisabled)] && [madDelegate mRaidDisabled])) {
         [post_params setValue: @"true"                                forKey:MADVERTISE_MRAID_KEY];
     }
 

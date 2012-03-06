@@ -17,9 +17,6 @@
 #import "MadvertiseView.h"
 
 @interface MadvertiseSDKSampleViewController : UIViewController {
-  NSArray *_animationData;  
-  NSArray *_bannerData;
-  MadvertiseAdClass currentBannerFormat;
   MadvertiseSDKSampleDelegate *madvertiseDemoDelegate;
 }
 

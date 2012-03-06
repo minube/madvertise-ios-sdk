@@ -155,13 +155,13 @@
   return [NSString stringWithFormat:template, size < 12 ? 12 : size, self.text, [self trackingHtml]];
 }
 
-- (NSString*) mraidToHtnl {
+- (NSString*) mraidToHtml {
     return [[NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl] stringByAppendingString:[self trackingHtml]];
 }
 
 - (NSString*) to_html {
     if (self.isRichMedia) {
-        return [self mraidToHtnl];
+        return [self mraidToHtml];
     }
     
     if (!self.hasBanner) {

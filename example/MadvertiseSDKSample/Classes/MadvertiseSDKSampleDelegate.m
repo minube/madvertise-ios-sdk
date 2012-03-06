@@ -27,11 +27,11 @@
   return YES;
 }
 
-- (double) durationOfBannerAnimation{
+- (double) durationOfBannerAnimation {
   return 2.0;
 }
 
-- (MadvertiseAnimationClass) bannerAnimationTyp{
+- (MadvertiseAnimationClass) bannerAnimationTyp {
   return MadvertiseAnimationClassFade;
 }
 
@@ -44,7 +44,7 @@
   return YES;
 }
 
-- (NSString*)age {
+- (NSString*) age {
   return @"21";
 }
 
@@ -52,13 +52,8 @@
   return @"M";
 }
 
-- (BOOL) richMediaDisabled {
+- (BOOL) mRaidDisabled {
     return NO;
 }
-
-//- (NSString*) adServer {
-////    return @"http://localhost:9292";
-//    return @"http://dl.dropbox.com/u/44264257";
-//}
 
 @end

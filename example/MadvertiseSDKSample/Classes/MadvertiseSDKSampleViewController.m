@@ -32,33 +32,30 @@ MadvertiseView *ad;
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-
-//  UIButton *btn= [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
-//  btn.frame = CGRectMake(100, 100, 100, 25);
-//  btn.backgroundColor = [UIColor clearColor];
-//  [btn addTarget:self action:@selector(showAd:event:) forControlEvents:UIControlEventTouchUpInside];
-//  [btn setTitle:@"Show ad" forState:UIControlStateNormal];
-//  [self.view addSubview:btn]; 
-//  [btn release];
-//  
-//  UIButton *btn2= [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
-//  btn2.frame = CGRectMake(100, 200, 100, 25);
-//  btn2.backgroundColor = [UIColor clearColor];
-//  [btn2 addTarget:self action:@selector(removeAd:event:) forControlEvents:UIControlEventTouchUpInside];
-//  [btn2 setTitle:@"Remove" forState:UIControlStateNormal];
-//  [self.view addSubview:btn2]; 
-//  [btn2 release];
   
-//    Create a new MadvertiseSDKSampleDelegate
+//    Create a new MadvertiseSDKSampleDelegate.
+//    
+//    Some possible delegate methods:
+//                               - (NSString *) appId : should return your SiteToken
+//                               - (BOOL) debugEnabled : return YES to enable debug-mode
+//                               - (CLLocationCoordinate2D) location : should return the location of the user
+//                               - (NSString*) age : should return the age of the user
+//                               - (NSString *) gender : should return the gender of the user
+//                               - (BOOL) mRaidDisabled : return YES to disable MRaid ads
     
     madvertiseDemoDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
     
 //    Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
-//    However, it is not recommended to use more than four of them. Futher more it is not recommended to use more than one RichMedia ad.
 //
-//    withClass: [MadvertiseAdClassMMA|MadvertiseAdClassMediumRectangle|MadvertiseAdClassLeaderboard|
-//                  MadvertiseAdClassFullscreen|MadvertiseAdClassPortrait|MadvertiseAdClassLandscape|MadvertiseAdClassRichMedia], the ad type.
-//    secondsToRefresh: [integer], the time after which a new ad will be loaded.
+//    withClass: MadvertiseAdClassMMA : 320x53
+//               MadvertiseAdClassMediumRectangle : 300x250
+//               MadvertiseAdClassLeaderboard : 728x90
+//               MadvertiseAdClassFullscreen : 768x768
+//               MadvertiseAdClassPortrait : 766x66
+//               MadvertiseAdClassLandscape : 1024x66
+//               MadvertiseAdClassRichMedia : fullscreen richmedia ad (overlay)
+//    
+//    secondsToRefresh: the time after which a new ad will be loaded
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         /* run something specific for the iPad */
@@ -68,7 +65,7 @@ MadvertiseView *ad;
         /* run something specific for the iPhone */
         
         ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
-//        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+//      ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
     }
     
     [ad place_at_x:0 y:0];
@@ -77,9 +74,15 @@ MadvertiseView *ad;
 }
 
 - (void) viewWillAppear:(BOOL)animated {
-    //observing adLoaded, adLoadFailed and adRichMediaClose Events
+//  observing adLoaded and adLoadFailed Events
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:) ForEvent:@"MadvertiseAdLoaded"];
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:) ForEvent:@"MadvertiseAdLoadFailed"];
+    
+//  furthermore it is possible to observe the following MRaid events:
+//            MadvertiseMRaidAppShouldSuspend : app should suspend (there will be an ad event)
+//            MadvertiseMRaidAppShouldResume : app should resume
+//    
+//  Please see MadvertiseView.m for more events.  
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -101,30 +104,5 @@ MadvertiseView *ad;
 - (void) onAdLoadedFailed:(NSNotification*)notify {
     MadLog(@"ad load faild with code: %@",[notify object]);
 }
-
-
-//- (void)showAd:(id)sender event:(id)event
-//{
-//    if (ad) {
-//        return;
-//    }
-//    
-//    madvertiseDemoDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
-//    ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
-//    //ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
-//    
-//    [ad place_at_x:0 y:0];
-//    [self.view addSubview:ad];
-//    [self.view bringSubviewToFront:ad];
-//}
-
-//- (void)removeAd:(id)sender event:(id)event
-//{
-//    if(ad) {
-//        [ad removeFromSuperview];
-//    }
-//    
-//    ad = nil; 
-//}
 
 @end
