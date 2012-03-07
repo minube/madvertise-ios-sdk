@@ -53,7 +53,7 @@
 #define MADVERTISE_DEVICE_HEIGHT_KEY @"device_height"
 #define MADVERTISE_PARENT_HEIGHT_KEY @"parent_height"
 #define MADVERTISE_PARENT_WIDTH_KEY @"parent_width"
-#define MADVERTISE_MRAID_KEY @"mr"
+#define MADVERTISE_MRAID_KEY @"mraid"
 
 
 NSString *UserAgentString(void);
