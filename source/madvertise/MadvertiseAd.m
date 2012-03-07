@@ -199,7 +199,7 @@
 }
 
 - (NSString*) mraidToHtml {
-    return [[NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl] stringByAppendingString:[self trackingHtml]];
+    return [NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl];
 }
 
 - (NSString*) to_html {
