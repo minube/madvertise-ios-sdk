@@ -265,7 +265,6 @@ static NSString * const kMraidURLScheme = @"mraid";
 - (NSString *)executeJavascript:(NSString *)javascript withVarArgs:(va_list)args {
     NSString *js = [[[NSString alloc] initWithFormat:javascript arguments:args] autorelease];
     
-    NSLog(@"%@", js);
     return [_webView stringByEvaluatingJavaScriptFromString:js];
 }
 
@@ -352,8 +351,6 @@ static NSString * const kMraidURLScheme = @"mraid";
     NSURL *url = [request URL];
     NSMutableString *urlString = [NSMutableString stringWithString:[url absoluteString]];
     NSString *scheme = url.scheme;
-    
-    NSLog(@"%@", urlString);
     
     if ([scheme isEqualToString:kMraidURLScheme]) {
         MPLogDebug(@"Trying to process command: %@", urlString);

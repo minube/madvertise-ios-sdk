@@ -8,7 +8,7 @@ It supports different banner sizes (mma, medium_rectangle, portrait, landscape, 
 
 h2. License
 
-The iOS SDK is using JSONKit, a library for parsing JSON data (https://github.com/johnezang/JSONKit), which is published under the BSD License, or alternatively under the terms of the Apache License, Version 2.0. Parts of the MRaid implementation are based on the MoPub iOS SDK and is published under the New BSD License.
+The iOS SDK is using JSONKit, a library for parsing JSON data (https://github.com/johnezang/JSONKit), which is published under the BSD License, or alternatively under the terms of the Apache License, Version 2.0. Parts of the MRaid implementation are based on the MoPub iOS SDK, which is published under the New BSD License (Parts of the MoPub iOS SDK are based on the ORMMA.org project; see /source/MRAID/LICENSE).
 
 All other code is published under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
 
