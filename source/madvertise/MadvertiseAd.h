@@ -24,6 +24,7 @@
   
     NSString* text;
     bool isRichMedia;
+    bool isMraid;
     bool hasBanner;
     bool shouldOpenInAppBrowser;
     int width;
