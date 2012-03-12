@@ -31,7 +31,7 @@
 @synthesize shouldOpenInAppBrowser;
 @synthesize trackingArray;
 
--(MadvertiseAd*)initFromDictionary:(NSDictionary*)dictionary {
+- (MadvertiseAd*)initFromDictionary:(NSDictionary*)dictionary {
 
   if ((self = [super init])) {
       MadLog(@"%@", dictionary);
@@ -44,8 +44,8 @@
       trackingArray = [dictionary objectForKey:@"tracking"];
       [trackingArray retain];
 
-      width  = 320;
-      height = 53;
+      width  = 0;
+      height = 0;
    
       if (hasBanner) {
           bannerUrl    = [[[dictionary objectForKey:@"banner"] objectForKey:@"url"] retain];
@@ -58,7 +58,7 @@
               richmediaUrl = [[rm objectForKey:@"full_url"] retain];
               richmediaMarkup = [[rm objectForKey:@"markup"] retain];
               isMraid = [[rm objectForKey:@"mraid"] boolValue];
-        
+              
               id w = [rm objectForKey:@"width"];
               if (w) {
                   width = [w intValue];
@@ -70,27 +70,6 @@
               }
           } else {
               isRichMedia = NO;
-              
-              // banner formats
-              if ([bannerType isEqualToString:@"medium_rectangle"]) {
-                  width   = 300;
-                  height  = 250;
-              } else if ([bannerType isEqualToString:@"mma"]) {
-                  width   = 320;
-                  height  = 53;
-              } else if ([bannerType isEqualToString:@"leaderboard"]){
-                  width   = 728;
-                  height  = 90;
-              } else if ([bannerType isEqualToString:@"fullscreen"]){
-                  width   = 768;
-                  height  = 768;
-              } else if ([bannerType isEqualToString:@"portrait"]){
-                  width   = 766;
-                  height  = 66;
-              } else if ([bannerType isEqualToString:@"landscape"]){
-                  width   = 1024;
-                  height  = 66;
-              }
           }
       }
   }

@@ -35,6 +35,26 @@ NSString * const MadvertiseAdClass_toString[] = {
   @"rich_media"
 };
 
+int const MadvertiseAdClass_toWidth[] = {
+    320,
+    300,
+    728,
+    768,
+    766,
+    1024,
+    320
+};
+
+int const MadvertiseAdClass_toHeight[] = {
+    53,
+    250,
+    90,
+    768,
+    66,
+    66,
+    480
+};
+
 // METHODS
 - (void) dealloc {
   MadLog(@"Call dealloc in MadvertiseView");
@@ -53,8 +73,7 @@ NSString * const MadvertiseAdClass_toString[] = {
   }
 
   self.madDelegate = nil;
-    
-  if(self.currentView) {
+  if (self.currentView) {
     self.currentView.delegate = nil;
       
       if([self.currentView respondsToSelector:@selector(stopLoading)]) {
@@ -123,27 +142,15 @@ NSString * const MadvertiseAdClass_toString[] = {
 }
 
 - (void)place_at_x:(int) x_pos y:(int) y_pos {
-  x = x_pos;
-  y = y_pos;
-
-  if (currentAdClass == MadvertiseAdClassMediumRectangle) {
-    self.frame = CGRectMake(x_pos, y_pos, 300, 250);
-  } else if(currentAdClass == MadvertiseAdClassMMA) {
-    self.frame = CGRectMake(x_pos, y_pos, 320, 53);
-  } else if(currentAdClass == MadvertiseAdClassLeaderboard) {
-    self.frame = CGRectMake(x_pos, y_pos, 728, 90);
-  } else if(currentAdClass == MadvertiseAdClassFullscreen) {
-    self.frame = CGRectMake(x_pos, y_pos, 768, 768);
-  } else if(currentAdClass == MadvertiseAdClassPortrait) {
-    self.frame = CGRectMake(x_pos, y_pos, 766, 66);
-  } else if(currentAdClass == MadvertiseAdClassLandscape) {
-    self.frame = CGRectMake(x_pos, y_pos, 1024, 66);
-  } else if(currentAdClass == MadvertiseAdClassRichMedia) {
-    x = 0;
-    y = 0;
-    CGRect screen     = [[UIScreen mainScreen] bounds];
-    self.frame = CGRectMake(0, 0, screen.size.width, screen.size.height);
-  }
+    x = x_pos;
+    y = y_pos;
+    
+    if (currentAdClass == MadvertiseAdClassRichMedia) {
+        x = 0;
+        y = 0;
+    }
+    
+    self.frame = CGRectMake(x_pos, y_pos, MadvertiseAdClass_toWidth[currentAdClass], MadvertiseAdClass_toHeight[currentAdClass]);
 }
 
 // helper method for initialization
@@ -236,12 +243,6 @@ NSString * const MadvertiseAdClass_toString[] = {
 
         MadLog(@"Creating ad");
         self.currentAd = [[[MadvertiseAd alloc] initFromDictionary:dictionary] autorelease];
-        
-        if (currentAdClass == MadvertiseAdClassRichMedia) {
-            CGRect screen     = [[UIScreen mainScreen] bounds];
-            currentAd.height  = screen.size.height;
-            currentAd.width   =  screen.size.width;
-        }
       
         [self displayView];
     } else if (!isExpanded) {
@@ -455,16 +456,10 @@ NSString * const MadvertiseAdClass_toString[] = {
     
     [self setUserInteractionEnabled:YES];
 
-    self.frame = CGRectMake(x, y , [currentAd width], [currentAd height]);
+    self.frame = CGRectMake(x, y , ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
     
-    CGRect frame = CGRectMake(0, 0, [currentAd width], [currentAd height]);
-    if ([currentAd isRichMedia]) {
-        // fullscreen ad
-        if (currentAdClass == MadvertiseAdClassRichMedia) {
-            CGRect screen = [[UIScreen mainScreen] bounds];
-            frame = CGRectMake(0, 0, screen.size.width, screen.size.height);
-        }
-        
+    CGRect frame = CGRectMake(0, 0, ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
+    if ([currentAd isRichMedia]) {        
         MRAdView *mraidView = [[MRAdView alloc] initWithFrame:frame 
                                                 allowsExpansion:YES
                                                 closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
@@ -730,17 +725,17 @@ NSString * const MadvertiseAdClass_toString[] = {
 }
 
 - (CGSize) getScreenResolution {
-  CGRect screen     = [[UIScreen mainScreen] bounds];
-  return CGSizeMake(screen.size.width, screen.size.height);
+    CGRect screen     = [[UIScreen mainScreen] bounds];
+    return CGSizeMake(screen.size.width, screen.size.height);
 }
 
 - (NSString*) getDeviceOrientation {
-  UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-  if(UIDeviceOrientationIsLandscape(orientation)){
-    return @"landscape";
-  }else{
-    return @"portrait";
-  }
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsLandscape(orientation)) {
+        return @"landscape";
+    } else {
+        return @"portrait";
+    }
 }
 
 @end
