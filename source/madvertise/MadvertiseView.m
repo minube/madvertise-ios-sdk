@@ -257,115 +257,89 @@ int const MadvertiseAdClass_toHeight[] = {
 
 // generate request, that is send to the ad server
 - (void)loadAd {
-  
-  [self retain];
+    [self retain];
+    [lock lock];
 
-  [lock lock];
+    if (self.request){
+      MadLog(@"loadAd - returning because another request is running");
+      [lock unlock];
+      [self release];
+      return;
+    }
 
-  if(self.request){
-    MadLog(@"loadAd - returning because another request is running");
-    [lock unlock];
-    [self release];
-    return;
-  }
+    NSString *server_url = @"http://ad.madvertise.de";
+    if (madDelegate != nil && [madDelegate respondsToSelector:@selector(adServer)]) {
+      server_url = [madDelegate adServer];
+    }
+    MadLog(@"Using url: %@", server_url);
 
-  NSString *server_url = @"http://ad.madvertise.de";
-  if(madDelegate != nil && [madDelegate respondsToSelector:@selector(adServer)]) {
-    server_url = [madDelegate adServer];
-  }
-  MadLog(@"Using url: %@", server_url);
+    // always supported request parameter
+    if (madDelegate == nil || ![madDelegate respondsToSelector:@selector(appId)]) {
+      MadLog(@"delegate does not respond to appId ! return ...");
+      [self release];
+      return;
+    }
 
-  // always supported request parameter //
-  if (madDelegate == nil || ![madDelegate respondsToSelector:@selector(appId)]) {
-    MadLog(@"delegate does not respond to appId ! return ...");
-    [self release];
-    return;
-  }
+    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/site/%@", server_url, [madDelegate appId]]];
+    MadLog(@"AppId : %@", [madDelegate appId]);
 
-  ////////////////  POST PARAMS ////////////////
-  NSMutableDictionary* post_params = [[NSMutableDictionary alloc] init];
-  self.receivedData = [NSMutableData data];
+    MadLog(@"Init new request");
+    self.request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
 
-  NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/site/%@", server_url, [madDelegate appId]]];
-  MadLog(@"AppId : %@", [madDelegate appId]);
+    NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];
+    [headers setValue:@"application/x-www-form-urlencoded; charset=utf-8" forKey:@"Content-Type"];
+    [headers setValue:@"application/vnd.madad+json; version=3" forKey:@"Accept"];
 
-  //get application name
-  NSString *appName = [MadvertiseUtilities getAppName];
-  [post_params setValue:appName forKey:MADVERTISE_APP_NAME_KEY];
-  MadLog(@"application name: %@", appName);
+    MadLog(@"ua: %@", UserAgentString());
 
-  NSString *appVersion = [MadvertiseUtilities getAppVersion];
-  [post_params setValue:appVersion forKey:MADVERTISE_APP_VERSION_KEY];
-  MadLog(@"application version: %@", appVersion);
+    NSMutableDictionary* post_params = [[NSMutableDictionary alloc] init];
+    self.receivedData = [NSMutableData data];
+    
+    CGSize parent_size = [self getParentViewDimensions];
+    CGSize screen_size = [self getScreenResolution];
 
-  //get parent size
-  CGSize parent_size =  [self getParentViewDimensions];
-  [post_params setValue:[NSNumber numberWithFloat:parent_size.width] forKey:MADVERTISE_PARENT_WIDTH_KEY];
-  [post_params setValue:[NSNumber numberWithFloat:parent_size.height] forKey:MADVERTISE_PARENT_HEIGHT_KEY];
-  MadLog(@"parent size: %.f x %.f",parent_size.width, parent_size.height);
-
-  //get screen size
-  CGSize screen_size = [self getScreenResolution];
-  [post_params setValue:[NSNumber numberWithFloat:screen_size.width] forKey:MADVERTISE_DEVICE_WIDTH_KEY];
-  [post_params setValue:[NSNumber numberWithFloat:screen_size.height] forKey:MADVERTISE_DEVICE_HEIGHT_KEY];
-  MadLog(@"screen size: %.f x %.f", screen_size.width, screen_size.height);
-
-  //get screen orientation
-  NSString* screen_orientation = [self getDeviceOrientation];
-  [post_params setValue:screen_orientation forKey:MADVERTISE_ORIENTATION_KEY];
-  MadLog(@"screen orientation: %@", screen_orientation);
-
-
-  // optional url request parameter
-  if ([madDelegate respondsToSelector:@selector(location)]) {
-    CLLocationCoordinate2D location = [madDelegate location];
-    [post_params setValue:[NSString stringWithFormat:@"%.6f", location.longitude] forKey:MADVERTISE_LNG_KEY];
-    [post_params setValue:[NSString stringWithFormat:@"%.6f", location.latitude] forKey:MADVERTISE_LAT_KEY];
-  }
-
-  if ([madDelegate respondsToSelector:@selector(gender)]) {
-    NSString *gender = [madDelegate gender];
-    [post_params setValue:gender forKey:MADVERTISE_GENDER_KEY];
-    MadLog(@"gender: %@", gender);
-  }
-
-  if ([madDelegate respondsToSelector:@selector(age)]) {
-    NSString *age = [madDelegate age];
-    [post_params setValue:age forKey:MADVERTISE_AGE_KEY];
-    MadLog(@"%@", age);
-  }
-
-  MadLog(@"Init new request");
-  self.request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
-
-  NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];
-  [headers setValue:@"application/x-www-form-urlencoded; charset=utf-8" forKey:@"Content-Type"];
-  [headers setValue:@"application/vnd.madad+json; version=3" forKey:@"Accept"];
-
-  MadLog(@"ua: %@", UserAgentString());
-
-    // get IP
-    NSString *ip = [MadvertiseUtilities getIP];
-    MadLog(@"IP: %@", ip);
-
-    [post_params setValue: @"true"                                    forKey:MADVERTISE_APP_KEY];
-    [post_params setValue: [MadvertiseUtilities getDeviceIDHash]      forKey:MADVERTISE_DEVICE_ID_KEY];
+    [post_params setValue: @"true"                                       forKey:MADVERTISE_APP_KEY];
+    [post_params setValue: [MadvertiseUtilities getDeviceIDMD5Hash]      forKey:MADVERTISE_UDIDMD5_KEY];
+    [post_params setValue: [MadvertiseUtilities getDeviceIDSHA1Hash]     forKey:MADVERTISE_UDIDSHA1_KEY];
+    [post_params setValue: [MadvertiseUtilities getMacMD5Hash]           forKey:MADVERTISE_MACMD5_KEY];
+    [post_params setValue: [MadvertiseUtilities getMacSHA1Hash]          forKey:MADVERTISE_MACSHA1_KEY];
+    [post_params setValue: [MadvertiseUtilities getIP]                   forKey:MADVERTISE_IP_KEY];
+    [post_params setValue: @"json"                                       forKey:MADVERTISE_FORMAT_KEY];
+    [post_params setValue: @"iPhone-SDK "                                forKey:MADVERTISE_REQUESTER_KEY];
+    [post_params setValue: MADVERTISE_SDK_VERION                         forKey:MADVERTISE_SDK_VERION_KEY];
+    [post_params setValue: [MadvertiseUtilities getTimestamp]            forKey:MADVERTISE_TIMESTAMP_KEY];
+    [post_params setValue: MadvertiseAdClass_toString[currentAdClass]    forKey:MADVERTISE_BANNER_TYPE_KEY];
+    [post_params setValue: [MadvertiseUtilities getAppName]              forKey:MADVERTISE_APP_NAME_KEY];
+    [post_params setValue: [MadvertiseUtilities getAppVersion]           forKey:MADVERTISE_APP_VERSION_KEY];
+    [post_params setValue: [NSNumber numberWithFloat:parent_size.width]  forKey:MADVERTISE_PARENT_WIDTH_KEY];
+    [post_params setValue: [NSNumber numberWithFloat:parent_size.height] forKey:MADVERTISE_PARENT_HEIGHT_KEY];
+    [post_params setValue: [NSNumber numberWithFloat:screen_size.width]  forKey:MADVERTISE_DEVICE_WIDTH_KEY];
+    [post_params setValue: [NSNumber numberWithFloat:screen_size.height] forKey:MADVERTISE_DEVICE_HEIGHT_KEY];
+    [post_params setValue: [self getDeviceOrientation]                   forKey:MADVERTISE_ORIENTATION_KEY];
     [post_params setValue: [UserAgentString() urlEncodeUsingEncoding:NSUTF8StringEncoding] forKey:MADVERTISE_USER_AGENT_KEY];
-    [post_params setValue: ip                                         forKey:MADVERTISE_IP_KEY];
-    [post_params setValue: @"json"                                    forKey:MADVERTISE_FORMAT_KEY];
-    [post_params setValue: @"iPhone-SDK "                             forKey:MADVERTISE_REQUESTER_KEY];
-    [post_params setValue: MADVERTISE_SDK_VERION                      forKey:MADVERTISE_SDK_VERION_KEY];
-    [post_params setValue: [MadvertiseUtilities getTimestamp]         forKey:MADVERTISE_TIMESTAMP_KEY];
-    [post_params setValue: MadvertiseAdClass_toString[currentAdClass] forKey:MADVERTISE_BANNER_TYPE_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
     
     if (!([madDelegate respondsToSelector:@selector(mRaidDisabled)] && [madDelegate mRaidDisabled])) {
         [post_params setValue: @"true"                                forKey:MADVERTISE_MRAID_KEY];
     }
+    if ([madDelegate respondsToSelector:@selector(location)]) {
+        CLLocationCoordinate2D location = [madDelegate location];
+        [post_params setValue:[NSString stringWithFormat:@"%.6f", location.longitude] forKey:MADVERTISE_LNG_KEY];
+        [post_params setValue:[NSString stringWithFormat:@"%.6f", location.latitude] forKey:MADVERTISE_LAT_KEY];
+    }
+    if ([madDelegate respondsToSelector:@selector(gender)]) {
+        NSString *gender = [madDelegate gender];
+        [post_params setValue:gender forKey:MADVERTISE_GENDER_KEY];
+        MadLog(@"gender: %@", gender);
+    }
+    if ([madDelegate respondsToSelector:@selector(age)]) {
+        NSString *age = [madDelegate age];
+        [post_params setValue:age forKey:MADVERTISE_AGE_KEY];
+        MadLog(@"%@", age);
+    }
 
     NSString *body = @"";
     unsigned int n = 0;
-    
     
     for (NSString* key in post_params) {
         body = [body stringByAppendingString:[NSString stringWithFormat:@"%@=%@", key, [post_params objectForKey:key]]];

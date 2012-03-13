@@ -27,6 +27,7 @@ h2. Preparations
   * UIKit.framework
   * CoreGraphics.framework
   * QuartzCore.framework
+  * Security.framework
 
 * Sign up at [madvertise](https://app.madvertise.de/register)
   * If you don't have already an account, please sign up.

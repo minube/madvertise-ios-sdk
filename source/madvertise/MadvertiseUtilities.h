@@ -21,6 +21,9 @@
 #import <CommonCrypto/CommonHMAC.h>
 #import <UIKit/UIKit.h>
 #import <UIKit/UIDevice.h>
+#include <sys/sysctl.h>
+#include <net/if.h>
+#include <net/if_dl.h>
 
 #if DEBUG
 #define MadLog(format, ...) [MadvertiseUtilities logWithPath:__FILE__ line:__LINE__ string:(format), ## __VA_ARGS__]
@@ -32,7 +35,12 @@
 
 #define MADVERTISE_USER_AGENT_KEY @"ua"
 #define MADVERTISE_APP_KEY @"app"
-#define MADVERTISE_DEVICE_ID_KEY @"udid"
+#define MADVERTISE_UDIDSHA1_KEY @"udid_sha1"
+#define MADVERTISE_UDIDMD5_KEY @"udid_md5"
+#define MADVERTISE_MACSHA1_KEY @"mac_sha1"
+#define MADVERTISE_MACMD5_KEY @"mac_md5"
+#define MADVERTISE_TOKENSHA1_KEY @"token_sha1"
+#define MADVERTISE_TOKENMD5_KEY @"token_md5"
 #define MADVERTISE_IP_KEY @"ip"
 #define MADVERTISE_FORMAT_KEY @"format"
 #define MADVERTISE_REQUESTER_KEY @"requester"
@@ -59,12 +67,15 @@
 NSString *UserAgentString(void);
 
 @interface MadvertiseUtilities : NSObject
-+ (NSString *) getIP;
-+ (NSString *) base64Hash:(NSString*) toHash;
-+ (NSString*) getDeviceIDHash;
-+ (NSString *) getTimestamp;
++ (NSString*) getIP;
++ (NSString*) getDeviceIDMD5Hash;
++ (NSString*) getDeviceIDSHA1Hash;
++ (NSString*) getMacMD5Hash;
++ (NSString*) getMacSHA1Hash;
++ (NSString*) getTimestamp;
 + (NSString*) getAppName;
 + (NSString*) getAppVersion;
+
 + (void)logWithPath:(char *)path line:(NSUInteger)line string:(NSString *)format, ...;
 
 @end

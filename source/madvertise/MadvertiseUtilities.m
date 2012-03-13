@@ -66,59 +66,138 @@ NSString* UserAgentString() {
 		}
 		freeifaddrs(addrs);
 	}
-	if(result == nil)
-		result = @"127.0.0.1";
+    
+	if (result == nil) {
+        result = @"127.0.0.1";
+    }
+    
 	return [result autorelease];
 }
 
-static char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-
-+ (NSString *) base64StringFromData: (NSData *) data {
-  NSMutableString *dest = [NSMutableString stringWithString:@""]; 
-  unsigned char * working = (unsigned char *)[data bytes];
-  int srcLen = [data length];
++ (NSString*) sha1:(NSString*)input {
+    const char *cstr = [input cStringUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [NSData dataWithBytes:cstr length:input.length];
     
-  // tackle the source in 3's as conveniently 4 Base64 nibbles fit into 3 bytes
-  for (int i=0; i<srcLen; i += 3)
-  {
-    // for each output nibble
-    for (int nib=0; nib<4; nib++)
-    {
-      // nibble:nib from char:byt
-      int byt = (nib == 0)?0:nib-1;
-      int ix = (nib+1)*2;
-        
-      if (i+byt >= srcLen) break;
-        
-      // extract the top bits of the nibble, if valid
-      unsigned char curr = ((working[i+byt] << (8-ix)) & 0x3F);
-        
-      // extract the bottom bits of the nibble, if valid
-      if (i+nib < srcLen) curr |= ((working[i+nib] >> ix) & 0x3F);
-        
-      [dest appendFormat:@"%c", base64[curr]];
+    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+    
+    CC_SHA1(data.bytes, data.length, digest);
+    
+    NSMutableString* output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
+    
+    for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
+        [output appendFormat:@"%02x", digest[i]];
     }
-      
-  }
-  for(int i = 0; i < [dest length] - (([dest length] / 4) * 4); i++)
-    [dest appendString:@","];
-  return dest;
-}
-
-+ (NSString *) base64Hash:(NSString*) toHash {
-  const char *cKey  = [@"madvertise" cStringUsingEncoding:NSASCIIStringEncoding];
-  const char *cData = [toHash cStringUsingEncoding:NSASCIIStringEncoding];
-  unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];
-  CCHmac(kCCHmacAlgSHA256, cKey, strlen(cKey), cData, strlen(cData), cHMAC);
-  NSData *HMAC = [[NSData alloc] initWithBytes:cHMAC length:sizeof(cHMAC)];
-  NSString* result = [MadvertiseUtilities base64StringFromData:HMAC];
-  [HMAC release];
-  return result;
     
+    return output;
 }
 
-+ (NSString*) getDeviceIDHash {
-    return [MadvertiseUtilities base64Hash:[[UIDevice currentDevice] uniqueIdentifier]];
++ (NSString *) md5:(NSString *) input {
+    const char *cStr = [input UTF8String];
+    unsigned char digest[16];
+    CC_MD5( cStr, strlen(cStr), digest);
+    
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    
+    for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++) {
+         [output appendFormat:@"%02x", digest[i]];
+    }
+    
+    return  output;
+}
+
++ (NSString *) getMacAddress {
+    int                 mgmtInfoBase[6];
+    char                *msgBuffer = NULL;
+    size_t              length;
+    unsigned char       macAddress[6];
+    struct if_msghdr    *interfaceMsgStruct;
+    struct sockaddr_dl  *socketStruct;
+    NSString            *errorFlag = NULL;
+    
+    // Setup the management Information Base (mib)
+    mgmtInfoBase[0] = CTL_NET;        // Request network subsystem
+    mgmtInfoBase[1] = AF_ROUTE;       // Routing table info
+    mgmtInfoBase[2] = 0;              
+    mgmtInfoBase[3] = AF_LINK;        // Request link layer information
+    mgmtInfoBase[4] = NET_RT_IFLIST;  // Request all configured interfaces
+    
+    // With all configured interfaces requested, get handle index
+    if ((mgmtInfoBase[5] = if_nametoindex("en0")) == 0) {
+        errorFlag = @"if_nametoindex failure";
+    }
+    else {
+        // Get the size of the data available (store in len)
+        if (sysctl(mgmtInfoBase, 6, NULL, &length, NULL, 0) < 0) 
+            errorFlag = @"sysctl mgmtInfoBase failure";
+        else
+        {
+            // Alloc memory based on above call
+            if ((msgBuffer = malloc(length)) == NULL)
+                errorFlag = @"buffer allocation failure";
+            else
+            {
+                // Get system information, store in buffer
+                if (sysctl(mgmtInfoBase, 6, msgBuffer, &length, NULL, 0) < 0)
+                    errorFlag = @"sysctl msgBuffer failure";
+            }
+        }
+    }
+    
+    // Befor going any further...
+    if (errorFlag != NULL) {
+        NSLog(@"Error: %@", errorFlag);
+        return errorFlag;
+    }
+    
+    // Map msgbuffer to interface message structure
+    interfaceMsgStruct = (struct if_msghdr *) msgBuffer;
+    
+    // Map to link-level socket structure
+    socketStruct = (struct sockaddr_dl *) (interfaceMsgStruct + 1);
+    
+    // Copy link layer address data in socket structure to an array
+    memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, 6);
+    
+    // Read from char array into a string object, into traditional Mac address format
+    NSString *macAddressString = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X", 
+                                  macAddress[0], macAddress[1], macAddress[2], 
+                                  macAddress[3], macAddress[4], macAddress[5]];
+    
+    // Release the buffer memory
+    free(msgBuffer);
+    
+    NSLog(@"%@", macAddressString);
+    
+    return macAddressString;
+}
+
++ (NSString*) getDeviceToken {
+    // TODO
+    return nil;
+}
+
++ (NSString*) getDeviceIDMD5Hash {
+    return [MadvertiseUtilities md5:[[UIDevice currentDevice] uniqueIdentifier]];
+}
+
++ (NSString*) getDeviceIDSHA1Hash {
+    return [MadvertiseUtilities sha1:[[UIDevice currentDevice] uniqueIdentifier]];
+}
+
++ (NSString*) getMacMD5Hash {
+    return [MadvertiseUtilities md5:[MadvertiseUtilities getMacAddress]];
+}
+
++ (NSString*) getMacSHA1Hash {
+    return [MadvertiseUtilities sha1:[MadvertiseUtilities getMacAddress]];
+}
+
++ (NSString*) getDeviceTokenMD5Hash {
+    return [MadvertiseUtilities md5:[MadvertiseUtilities getDeviceToken]];
+}
+
++ (NSString*) getDeviceTokenSHA1Hash {
+    return [MadvertiseUtilities sha1:[MadvertiseUtilities getDeviceToken]];
 }
 
 + (NSString*) getTimestamp {

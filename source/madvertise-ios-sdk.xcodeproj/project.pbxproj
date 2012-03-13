@@ -35,6 +35,8 @@
 		4D0A078814F5357E00852970 /* UIWebView+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A078414F5357E00852970 /* UIWebView+MPAdditions.m */; };
 		4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */; };
 		4D8BE2E014D6E04A00212FD0 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */; };
+		4DA0CD5C150FA53C002E7FCB /* SFHFKeychainUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA0CD5A150FA53C002E7FCB /* SFHFKeychainUtils.h */; };
+		4DA0CD5D150FA53C002E7FCB /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA0CD5B150FA53C002E7FCB /* SFHFKeychainUtils.m */; };
 		5B4E248813F0323700F67F5A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B0A658013EFEA7B0032A2DD /* Foundation.framework */; };
 		5B63957013F40F4E003D95AF /* MadvertiseAd.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B63956C13F40F4E003D95AF /* MadvertiseAd.h */; };
 		5B63957213F40F4E003D95AF /* MadvertiseTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B63956E13F40F4E003D95AF /* MadvertiseTracker.h */; };
@@ -79,6 +81,8 @@
 		4D0A078414F5357E00852970 /* UIWebView+MPAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+MPAdditions.m"; sourceTree = "<group>"; };
 		4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = SOURCE_ROOT; };
 		4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = SOURCE_ROOT; };
+		4DA0CD5A150FA53C002E7FCB /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = SOURCE_ROOT; };
+		4DA0CD5B150FA53C002E7FCB /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = SOURCE_ROOT; };
 		4DB4087C14FE6BB900E44C4E /* MRAID.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MRAID.bundle; sourceTree = "<group>"; };
 		5B0A658013EFEA7B0032A2DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5B0A65C913F00B660032A2DD /* MadvertiseDelegationProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MadvertiseDelegationProtocol.h; sourceTree = "<group>"; };
@@ -157,6 +161,15 @@
 			name = JSONKit;
 			sourceTree = "<group>";
 		};
+		4DA0CD58150FA516002E7FCB /* SFHFKeychainUtils */ = {
+			isa = PBXGroup;
+			children = (
+				4DA0CD5A150FA53C002E7FCB /* SFHFKeychainUtils.h */,
+				4DA0CD5B150FA53C002E7FCB /* SFHFKeychainUtils.m */,
+			);
+			name = SFHFKeychainUtils;
+			sourceTree = "<group>";
+		};
 		5B0A657213EFEA7B0032A2DD = {
 			isa = PBXGroup;
 			children = (
@@ -185,6 +198,7 @@
 		5B0A658213EFEA7B0032A2DD /* madvertise-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				4DA0CD58150FA516002E7FCB /* SFHFKeychainUtils */,
 				4D0A078214F5357E00852970 /* UIWebView Categories */,
 				4D0A075D14F5342000852970 /* MRAID */,
 				4D8BE2DC14D6E02B00212FD0 /* JSONKit */,
@@ -237,6 +251,7 @@
 				4D059B5314FE674700BB8173 /* MPGlobal.h in Headers */,
 				4D059B5514FE674800BB8173 /* MPLogging.h in Headers */,
 				4D059B5714FE674800BB8173 /* MPTimer.h in Headers */,
+				4DA0CD5C150FA53C002E7FCB /* SFHFKeychainUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,7 +281,7 @@
 		5B0A657413EFEA7B0032A2DD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 				ORGANIZATIONNAME = "madvertise GmbH";
 			};
 			buildConfigurationList = 5B0A657713EFEA7B0032A2DD /* Build configuration list for PBXProject "madvertise-ios-sdk" */;
@@ -308,6 +323,7 @@
 				4D059B5414FE674800BB8173 /* MPGlobal.m in Sources */,
 				4D059B5614FE674800BB8173 /* MPLogging.m in Sources */,
 				4D059B5814FE674800BB8173 /* MPTimer.m in Sources */,
+				4DA0CD5D150FA53C002E7FCB /* SFHFKeychainUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
