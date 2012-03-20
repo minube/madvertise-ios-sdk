@@ -166,8 +166,6 @@ NSString* UserAgentString() {
     // Release the buffer memory
     free(msgBuffer);
     
-    NSLog(@"%@", macAddressString);
-    
     return macAddressString;
 }
 
@@ -176,7 +174,7 @@ NSString* UserAgentString() {
     return nil;
 }
 
-+ (NSString*) getDeviceIDMD5Hash {
++ (NSString*) getDeviceIDMD5Hash {    
     return [MadvertiseUtilities md5:[[UIDevice currentDevice] uniqueIdentifier]];
 }
 
