@@ -141,7 +141,6 @@
 		6D9F920213AA132C009DEF37 = {
 			isa = PBXGroup;
 			children = (
-				4D37F6B0151A3873006E3AEF /* Security.framework */,
 				5B4E253E13F0356F00F67F5A /* madvertise-ios-sdk.xcodeproj */,
 				6D9F921713AA132C009DEF37 /* MadvertiseSDKSample */,
 				6D9F921013AA132C009DEF37 /* Frameworks */,
@@ -160,6 +159,7 @@
 		6D9F921013AA132C009DEF37 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D37F6B0151A3873006E3AEF /* Security.framework */,
 				6D47223D13AA1C9700858222 /* QuartzCore.framework */,
 				6D47223313AA1C3700858222 /* CoreGraphics.framework */,
 				6D47223013AA1BF700858222 /* SystemConfiguration.framework */,
