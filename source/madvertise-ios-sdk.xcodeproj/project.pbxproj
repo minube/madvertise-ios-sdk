@@ -33,6 +33,7 @@
 		4D0A077914F5342000852970 /* MRProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A076B14F5342000852970 /* MRProperty.m */; };
 		4D0A078714F5357E00852970 /* UIWebView+MPAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A078314F5357E00852970 /* UIWebView+MPAdditions.h */; };
 		4D0A078814F5357E00852970 /* UIWebView+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A078414F5357E00852970 /* UIWebView+MPAdditions.m */; };
+		4D3A1887151B966200E0D347 /* MPAdBrowserController.xib in Headers */ = {isa = PBXBuildFile; fileRef = 4D059B4614FE674700BB8173 /* MPAdBrowserController.xib */; };
 		4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */; };
 		4D8BE2E014D6E04A00212FD0 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */; };
 		4DA0CD5C150FA53C002E7FCB /* SFHFKeychainUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA0CD5A150FA53C002E7FCB /* SFHFKeychainUtils.h */; };
@@ -239,6 +240,7 @@
 				4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */,
 				4D0A076D14F5342000852970 /* MRAdView+Controllers.h in Headers */,
 				4D0A076E14F5342000852970 /* MRAdView.h in Headers */,
+				4D3A1887151B966200E0D347 /* MPAdBrowserController.xib in Headers */,
 				4D0A077014F5342000852970 /* MRAdViewBrowsingController.h in Headers */,
 				4D0A077214F5342000852970 /* MRAdViewDisplayController.h in Headers */,
 				4D0A077414F5342000852970 /* MRCommand.h in Headers */,
