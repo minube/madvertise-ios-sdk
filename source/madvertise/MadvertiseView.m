@@ -83,6 +83,7 @@ int const MadvertiseAdClass_toHeight[] = {
       currentView = nil;
   }
   
+    [currentAd release];
   currentAd = nil;
     
   [lock release];
@@ -239,6 +240,7 @@ int const MadvertiseAdClass_toHeight[] = {
         NSDictionary *dictionary = [receivedData objectFromJSONData];
 
         MadLog(@"Creating ad");
+        [currentAd release];
         currentAd = [[MadvertiseAd alloc] initFromDictionary:dictionary];
       
         [self displayView];
