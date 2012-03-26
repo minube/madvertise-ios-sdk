@@ -455,11 +455,11 @@ int const MadvertiseAdClass_toHeight[] = {
         [view loadHTMLString:[currentAd to_html] baseURL:nil];
         
         [self webViewDidFinishLoad:view];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
+        
+        [self createAdReloadTimer];
     }
-    
-    [self createAdReloadTimer];
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
 }
 
 
@@ -594,6 +594,8 @@ int const MadvertiseAdClass_toHeight[] = {
 
 - (void)adDidLoad:(MRAdView *)adView {
     [self swapView:adView oldView:currentView];
+    [self createAdReloadTimer];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
 }
 
