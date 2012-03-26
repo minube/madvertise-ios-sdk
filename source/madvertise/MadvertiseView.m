@@ -62,7 +62,7 @@ int const MadvertiseAdClass_toHeight[] = {
   [[NSNotificationCenter defaultCenter] removeObserver: self name:UIApplicationDidEnterBackgroundNotification object:nil];
   [[NSNotificationCenter defaultCenter] removeObserver: self name:UIApplicationDidBecomeActiveNotification object:nil];
 
-  //[self.conn cancel];
+  [self.conn cancel];
   self.conn = nil;
   self.request = nil;
   self.receivedData = nil;
