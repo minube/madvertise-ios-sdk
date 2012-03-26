@@ -446,8 +446,6 @@ int const MadvertiseAdClass_toHeight[] = {
         else {
             [mraidView loadCreativeWithHTMLString:[currentAd to_html] baseURL:nil];
         }
-        
-        [self swapView:mraidView oldView:currentView];
     }
     else {
         UIWebView* view = [[UIWebView alloc] initWithFrame:frame];
@@ -595,6 +593,7 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)adDidLoad:(MRAdView *)adView {
+    [self swapView:adView oldView:currentView];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
 }
 
