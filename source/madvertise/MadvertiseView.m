@@ -73,17 +73,17 @@ int const MadvertiseAdClass_toHeight[] = {
   }
 
   self.madDelegate = nil;
-  if (self.currentView) {
-    self.currentView.delegate = nil;
-      
-      if([self.currentView respondsToSelector:@selector(stopLoading)]) {
-          [self.currentView stopLoading];
+  if (currentView) {
+      if ([currentView isKindOfClass:[UIWebView class]]) {
+          ((UIWebView *)currentView).delegate = nil;
+          if ([currentView respondsToSelector:@selector(stopLoading)]) {
+              [((UIWebView *)currentView) stopLoading];
+          }
       }
-    
-    self.currentView = nil;
+      currentView = nil;
   }
   
-  self.currentAd   = nil;
+  currentAd = nil;
     
   [lock release];
   lock = nil;
@@ -99,7 +99,6 @@ int const MadvertiseAdClass_toHeight[] = {
     return [self loadAdWithDelegate:delegate withClass:adClassValue placementType:MRAdViewPlacementTypeInline secondsToRefresh:secondsToRefresh];
 }
 
-// main-constructor
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
   BOOL enableDebug = NO;
 
@@ -162,9 +161,8 @@ int const MadvertiseAdClass_toHeight[] = {
     self.clipsToBounds = YES;
 
     // just a dummy placeholder
-    self.currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    [self addSubview: self.currentView];
-    [currentView release];
+    currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    [self addSubview: currentView];
     
     currentAdClass     = adClassValue;
 
@@ -172,7 +170,6 @@ int const MadvertiseAdClass_toHeight[] = {
     request             = nil;
     receivedData        = nil;
     responseCode        = 200;
-    isBannerMode        = YES;
     timer               = nil;
       
     isExpanded = false;
@@ -242,7 +239,7 @@ int const MadvertiseAdClass_toHeight[] = {
         NSDictionary *dictionary = [receivedData objectFromJSONData];
 
         MadLog(@"Creating ad");
-        self.currentAd = [[[MadvertiseAd alloc] initFromDictionary:dictionary] autorelease];
+        currentAd = [[MadvertiseAd alloc] initFromDictionary:dictionary];
       
         [self displayView];
     } else if (!isExpanded) {
@@ -296,11 +293,9 @@ int const MadvertiseAdClass_toHeight[] = {
     self.receivedData = [NSMutableData data];
     
     CGSize parent_size = [self getParentViewDimensions];
-    CGSize screen_size = [self getScreenResolution];
+    CGSize screen_size = [MadvertiseUtilities getScreenResolution];
 
     [post_params setValue: @"true"                                       forKey:MADVERTISE_APP_KEY];
-    [post_params setValue: [MadvertiseUtilities getDeviceIDMD5Hash]      forKey:MADVERTISE_UDIDMD5_KEY];
-    [post_params setValue: [MadvertiseUtilities getDeviceIDSHA1Hash]     forKey:MADVERTISE_UDIDSHA1_KEY];
     [post_params setValue: [MadvertiseUtilities getMacMD5Hash]           forKey:MADVERTISE_MACMD5_KEY];
     [post_params setValue: [MadvertiseUtilities getMacSHA1Hash]          forKey:MADVERTISE_MACSHA1_KEY];
     [post_params setValue: [MadvertiseUtilities getIP]                   forKey:MADVERTISE_IP_KEY];
@@ -315,7 +310,7 @@ int const MadvertiseAdClass_toHeight[] = {
     [post_params setValue: [NSNumber numberWithFloat:parent_size.height] forKey:MADVERTISE_PARENT_HEIGHT_KEY];
     [post_params setValue: [NSNumber numberWithFloat:screen_size.width]  forKey:MADVERTISE_DEVICE_WIDTH_KEY];
     [post_params setValue: [NSNumber numberWithFloat:screen_size.height] forKey:MADVERTISE_DEVICE_HEIGHT_KEY];
-    [post_params setValue: [self getDeviceOrientation]                   forKey:MADVERTISE_ORIENTATION_KEY];
+    [post_params setValue: [MadvertiseUtilities getDeviceOrientation]    forKey:MADVERTISE_ORIENTATION_KEY];
     [post_params setValue: [UserAgentString() urlEncodeUsingEncoding:NSUTF8StringEncoding] forKey:MADVERTISE_USER_AGENT_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
     
@@ -411,7 +406,7 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)aWebView {
-    if(aWebView != currentView) {
+    if (aWebView != currentView) {
         [self swapView:aWebView oldView:currentView];
     }
 }
@@ -428,12 +423,15 @@ int const MadvertiseAdClass_toHeight[] = {
         return;
     }
     
+    [self stopTimer];
+    
     [self setUserInteractionEnabled:YES];
 
     self.frame = CGRectMake(x, y , ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
     
     CGRect frame = CGRectMake(0, 0, ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
-    if ([currentAd isRichMedia]) {        
+    
+    if ([currentAd isRichMedia]) {
         MRAdView *mraidView = [[MRAdView alloc] initWithFrame:frame 
                                                 allowsExpansion:YES
                                                 closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
@@ -446,6 +444,8 @@ int const MadvertiseAdClass_toHeight[] = {
         else {
             [mraidView loadCreativeWithHTMLString:[currentAd to_html] baseURL:nil];
         }
+        
+        [self swapView:mraidView oldView:currentView];
     }
     else {
         UIWebView* view = [[UIWebView alloc] initWithFrame:frame];
@@ -453,7 +453,11 @@ int const MadvertiseAdClass_toHeight[] = {
         
         view.delegate = self;
         [view loadHTMLString:[currentAd to_html] baseURL:nil];
+        
+        [self webViewDidFinishLoad:view];
     }
+    
+    [self createAdReloadTimer];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
 }
@@ -486,13 +490,13 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)swapView:(UIWebView*)newView oldView:(UIWebView*) oldView {
-  MadvertiseAnimationClass animationTyp;
+    MadvertiseAnimationClass animationTyp;
   
-  if ([madDelegate respondsToSelector:@selector(bannerAnimationTyp)]) {
-    animationTyp = [madDelegate bannerAnimationTyp];
-  } else {
-    animationTyp = MadvertiseAnimationClassNone;
-  }
+    if ([madDelegate respondsToSelector:@selector(bannerAnimationTyp)]) {
+        animationTyp = [madDelegate bannerAnimationTyp];
+    } else {
+        animationTyp = MadvertiseAnimationClassNone;
+    }
 
     if (currentAdClass == MadvertiseAdClassRichMedia) {
         animationTyp = MadvertiseAnimationClassNone;
@@ -502,42 +506,42 @@ int const MadvertiseAdClass_toHeight[] = {
       [self addSubview:newView];
       [self bringSubviewToFront:newView];
       [oldView removeFromSuperview];
-      self.currentView = newView;
+      currentView = newView;
       return;
     }
   
-  UIViewAnimationTransition transition = UIViewAnimationTransitionNone;
+    UIViewAnimationTransition transition = UIViewAnimationTransitionNone;
   
-  float newStartAlpha = 1;
-  float newEndAlpha = 1;
-  float oldEndAlpha = 1;
+    float newStartAlpha = 1;
+    float newEndAlpha = 1;
+    float oldEndAlpha = 1;
 
-  CGRect newStart = [newView frame];
-  CGRect newEnd = [newView frame];
-  CGRect oldEnd = [oldView frame];
+    CGRect newStart = [newView frame];
+    CGRect newEnd = [newView frame];
+    CGRect oldEnd = [oldView frame];
   
-  switch (animationTyp) {
-    case MadvertiseAnimationClassLeftToRight:
-      newStart.origin = CGPointMake(-newStart.size.width, newStart.origin.y);
-      oldEnd.origin = CGPointMake(oldEnd.origin.x + oldEnd.size.width, oldEnd.origin.y);
-      break;
-    case MadvertiseAnimationClassTopToBottom:
-      newStart.origin = CGPointMake(newStart.origin.x, -newStart.size.height);
-      oldEnd.origin = CGPointMake(oldEnd.origin.x, oldEnd.origin.y + oldEnd.size.height);
-      break;
-    case MadvertiseAnimationClassCurlDown:
-      transition = UIViewAnimationTransitionCurlDown;
-      break;
-    case MadvertiseAnimationClassNone:
-      break;
-    case MadvertiseAnimationClassFade:
-      newStartAlpha = 0;
-      newEndAlpha = 1;
-      oldEndAlpha = 0;
-      break;
-    default:
-      break;
-  }
+    switch (animationTyp) {
+        case MadvertiseAnimationClassLeftToRight:
+            newStart.origin = CGPointMake(-newStart.size.width, newStart.origin.y);
+            oldEnd.origin = CGPointMake(oldEnd.origin.x + oldEnd.size.width, oldEnd.origin.y);
+            break;
+        case MadvertiseAnimationClassTopToBottom:
+            newStart.origin = CGPointMake(newStart.origin.x, -newStart.size.height);
+            oldEnd.origin = CGPointMake(oldEnd.origin.x, oldEnd.origin.y + oldEnd.size.height);
+            break;
+        case MadvertiseAnimationClassCurlDown:
+            transition = UIViewAnimationTransitionCurlDown;
+            break;
+        case MadvertiseAnimationClassNone:
+            break;
+        case MadvertiseAnimationClassFade:
+            newStartAlpha = 0;
+            newEndAlpha = 1;
+            oldEndAlpha = 0;
+            break;
+        default:
+            break;
+    }
   
     newView.frame = newStart;
     newView.alpha = newStartAlpha;
@@ -561,10 +565,11 @@ int const MadvertiseAdClass_toHeight[] = {
     [UIView setAnimationDidStopSelector:@selector(removeFromSuperview)];
     [UIView commitAnimations];
 
-    self.currentView.delegate = nil;
-    
-    if([self.currentView respondsToSelector:@selector(stopLoading)]) {
-        [self.currentView stopLoading];
+    if ([currentView isKindOfClass:[UIWebView class]]) {
+        ((UIWebView *)currentView).delegate = nil;
+        if ([currentView respondsToSelector:@selector(stopLoading)]) {
+            [((UIWebView *)currentView) stopLoading];
+        }
     }
     
     self.currentView = newView;
@@ -588,7 +593,6 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)adDidLoad:(MRAdView *)adView {
-    [self swapView:adView oldView:currentView];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
 }
 
@@ -685,10 +689,8 @@ int const MadvertiseAdClass_toHeight[] = {
     [self createAdReloadTimer];
 }
 
-//////////////////////////////////////////
-// private methonds for internal use only
-//////////////////////////////////////////
 #pragma mark - private methods section
+
 - (CGSize) getParentViewDimensions {
 
   if([self superview] != nil){
@@ -696,20 +698,6 @@ int const MadvertiseAdClass_toHeight[] = {
     return CGSizeMake(parent.frame.size.width, parent.frame.size.height);
   }
   return CGSizeMake(0, 0);
-}
-
-- (CGSize) getScreenResolution {
-    CGRect screen     = [[UIScreen mainScreen] bounds];
-    return CGSizeMake(screen.size.width, screen.size.height);
-}
-
-- (NSString*) getDeviceOrientation {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    if (UIDeviceOrientationIsLandscape(orientation)) {
-        return @"landscape";
-    } else {
-        return @"portrait";
-    }
 }
 
 @end

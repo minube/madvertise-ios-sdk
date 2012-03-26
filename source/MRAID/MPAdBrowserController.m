@@ -248,18 +248,13 @@ static NSArray *BROWSER_SCHEMES, *SPECIAL_HOSTS;
 #pragma mark -
 #pragma mark Drawing
 
-- (CGContextRef)createContext
+- (UIImage *)backArrowImage
 {
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	CGContextRef context = CGBitmapContextCreate(nil,27,27,8,0,
 												 colorSpace,kCGImageAlphaPremultipliedLast);
 	CFRelease(colorSpace);
-	return context;
-}
-
-- (UIImage *)backArrowImage
-{
-	CGContextRef context = [self createContext];
+    
 	CGColorRef fillColor = [[UIColor blackColor] CGColor];
 	CGContextSetFillColor(context, CGColorGetComponents(fillColor));
 	
@@ -280,7 +275,11 @@ static NSArray *BROWSER_SCHEMES, *SPECIAL_HOSTS;
 
 - (UIImage *)forwardArrowImage
 {
-	CGContextRef context = [self createContext];
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+	CGContextRef context = CGBitmapContextCreate(nil,27,27,8,0,
+												 colorSpace,kCGImageAlphaPremultipliedLast);
+	CFRelease(colorSpace);
+    
 	CGColorRef fillColor = [[UIColor blackColor] CGColor];
 	CGContextSetFillColor(context, CGColorGetComponents(fillColor));
 	

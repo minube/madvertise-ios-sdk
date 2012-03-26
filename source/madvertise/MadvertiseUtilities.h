@@ -31,12 +31,10 @@
 #define MadLog(format, ...)
 #endif
 
-#define MADVERTISE_SDK_VERION @"5.0.0"
+#define MADVERTISE_SDK_VERION @"5.0.1"
 
 #define MADVERTISE_USER_AGENT_KEY @"ua"
 #define MADVERTISE_APP_KEY @"app"
-#define MADVERTISE_UDIDSHA1_KEY @"udid_sha1"
-#define MADVERTISE_UDIDMD5_KEY @"udid_md5"
 #define MADVERTISE_MACSHA1_KEY @"mac_sha1"
 #define MADVERTISE_MACMD5_KEY @"mac_md5"
 #define MADVERTISE_TOKENSHA1_KEY @"token_sha1"
@@ -68,13 +66,13 @@ NSString *UserAgentString(void);
 
 @interface MadvertiseUtilities : NSObject
 + (NSString*) getIP;
-+ (NSString*) getDeviceIDMD5Hash;
-+ (NSString*) getDeviceIDSHA1Hash;
 + (NSString*) getMacMD5Hash;
 + (NSString*) getMacSHA1Hash;
 + (NSString*) getTimestamp;
 + (NSString*) getAppName;
 + (NSString*) getAppVersion;
++ (CGSize) getScreenResolution;
++ (NSString*) getDeviceOrientation;
 
 + (void)logWithPath:(char *)path line:(NSUInteger)line string:(NSString *)format, ...;
 

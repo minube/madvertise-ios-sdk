@@ -108,11 +108,8 @@ NSString* UserAgentString() {
 + (NSString *) getMacAddress {
     int                 mgmtInfoBase[6];
     char                *msgBuffer = NULL;
-    size_t              length;
-    unsigned char       macAddress[6];
-    struct if_msghdr    *interfaceMsgStruct;
-    struct sockaddr_dl  *socketStruct;
     NSString            *errorFlag = NULL;
+    size_t              length;
     
     // Setup the management Information Base (mib)
     mgmtInfoBase[0] = CTL_NET;        // Request network subsystem
@@ -125,61 +122,41 @@ NSString* UserAgentString() {
     if ((mgmtInfoBase[5] = if_nametoindex("en0")) == 0) {
         errorFlag = @"if_nametoindex failure";
     }
+    // Get the size of the data available (store in len)
+    else if (sysctl(mgmtInfoBase, 6, NULL, &length, NULL, 0) < 0) {
+        errorFlag = @"sysctl mgmtInfoBase failure";
+    }
+    // Alloc memory based on above call
+    else if ((msgBuffer = malloc(length)) == NULL) {
+        errorFlag = @"buffer allocation failure";
+    }
+    // Get system information, store in buffer
+    else if (sysctl(mgmtInfoBase, 6, msgBuffer, &length, NULL, 0) < 0) {
+        free(msgBuffer);
+        errorFlag = @"sysctl msgBuffer failure";
+    }
     else {
-        // Get the size of the data available (store in len)
-        if (sysctl(mgmtInfoBase, 6, NULL, &length, NULL, 0) < 0) 
-            errorFlag = @"sysctl mgmtInfoBase failure";
-        else
-        {
-            // Alloc memory based on above call
-            if ((msgBuffer = malloc(length)) == NULL)
-                errorFlag = @"buffer allocation failure";
-            else
-            {
-                // Get system information, store in buffer
-                if (sysctl(mgmtInfoBase, 6, msgBuffer, &length, NULL, 0) < 0)
-                    errorFlag = @"sysctl msgBuffer failure";
-            }
-        }
+        // Map msgbuffer to interface message structure
+        struct if_msghdr *interfaceMsgStruct = (struct if_msghdr *) msgBuffer;
+        
+        // Map to link-level socket structure
+        struct sockaddr_dl *socketStruct = (struct sockaddr_dl *) (interfaceMsgStruct + 1);
+        
+        // Copy link layer address data in socket structure to an array
+        unsigned char macAddress[6];
+        memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, 6);
+        
+        // Read from char array into a string object, into traditional Mac address format
+        NSString *macAddressString = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X",
+                                      macAddress[0], macAddress[1], macAddress[2], macAddress[3], macAddress[4], macAddress[5]];
+        
+        // Release the buffer memory
+        free(msgBuffer);
+        
+        return macAddressString;
     }
     
-    // Befor going any further...
-    if (errorFlag != NULL) {
-        NSLog(@"Error: %@", errorFlag);
-        return errorFlag;
-    }
-    
-    // Map msgbuffer to interface message structure
-    interfaceMsgStruct = (struct if_msghdr *) msgBuffer;
-    
-    // Map to link-level socket structure
-    socketStruct = (struct sockaddr_dl *) (interfaceMsgStruct + 1);
-    
-    // Copy link layer address data in socket structure to an array
-    memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, 6);
-    
-    // Read from char array into a string object, into traditional Mac address format
-    NSString *macAddressString = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X", 
-                                  macAddress[0], macAddress[1], macAddress[2], 
-                                  macAddress[3], macAddress[4], macAddress[5]];
-    
-    // Release the buffer memory
-    free(msgBuffer);
-    
-    return macAddressString;
-}
-
-+ (NSString*) getDeviceToken {
-    // TODO
-    return nil;
-}
-
-+ (NSString*) getDeviceIDMD5Hash {    
-    return [MadvertiseUtilities md5:[[UIDevice currentDevice] uniqueIdentifier]];
-}
-
-+ (NSString*) getDeviceIDSHA1Hash {
-    return [MadvertiseUtilities sha1:[[UIDevice currentDevice] uniqueIdentifier]];
+    return errorFlag;
 }
 
 + (NSString*) getMacMD5Hash {
@@ -188,14 +165,6 @@ NSString* UserAgentString() {
 
 + (NSString*) getMacSHA1Hash {
     return [MadvertiseUtilities sha1:[MadvertiseUtilities getMacAddress]];
-}
-
-+ (NSString*) getDeviceTokenMD5Hash {
-    return [MadvertiseUtilities md5:[MadvertiseUtilities getDeviceToken]];
-}
-
-+ (NSString*) getDeviceTokenSHA1Hash {
-    return [MadvertiseUtilities sha1:[MadvertiseUtilities getDeviceToken]];
 }
 
 + (NSString*) getTimestamp {
@@ -221,6 +190,20 @@ NSString* UserAgentString() {
 	NSLog(@"%@", [NSString stringWithFormat:@"%@ (%d): %@", [pathString lastPathComponent], line, formattedString]);
 	[formattedString release];
 	[pathString release];
+}
+
++ (CGSize) getScreenResolution {
+    CGRect screen = [[UIScreen mainScreen] bounds];
+    return CGSizeMake(screen.size.width, screen.size.height);
+}
+
++ (NSString*) getDeviceOrientation {
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsLandscape(orientation)) {
+        return @"landscape";
+    } else {
+        return @"portrait";
+    }
 }
 
 @end

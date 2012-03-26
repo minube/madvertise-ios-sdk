@@ -48,7 +48,6 @@
 - (IBAction)done;
 
 // Drawing methods.
-- (CGContextRef)createContext;
 - (UIImage *)backArrowImage;
 - (UIImage *)forwardArrowImage;
 

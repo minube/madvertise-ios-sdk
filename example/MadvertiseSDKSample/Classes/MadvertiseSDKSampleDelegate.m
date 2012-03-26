@@ -20,7 +20,7 @@
 #pragma mark MadvertiseDelegateProtocol Methods
 
 - (NSString *) appId {
-    return @"TestTokn";
+  return @"TestTokn";
 }
 
 - (BOOL) debugEnabled {
@@ -28,29 +28,29 @@
 }
 
 - (double) durationOfBannerAnimation {
-  return 2.0;
+  return 1.0;
 }
 
 - (MadvertiseAnimationClass) bannerAnimationTyp {
   return MadvertiseAnimationClassFade;
 }
 
-- (CLLocationCoordinate2D) location {
-    CLLocationCoordinate2D _location = { 8.807081, 53.074981 };
-    return _location;
-}
+//- (CLLocationCoordinate2D) location {
+//    CLLocationCoordinate2D _location = { 8.807081, 53.074981 };
+//    return _location;
+//}
 
 - (BOOL) downloadTrackerEnabled {
   return YES;
 }
 
-- (NSString*) age {
-  return @"21";
-}
+//- (NSString*) age {
+//  return @"21";
+//}
 
-- (NSString *) gender {
-  return @"M";
-}
+//- (NSString *) gender {
+//  return @"M";
+//}
 
 - (BOOL) mRaidDisabled {
     return NO;

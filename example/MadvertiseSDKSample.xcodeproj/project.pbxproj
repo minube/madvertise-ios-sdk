@@ -263,7 +263,7 @@
 		6D9F920413AA132C009DEF37 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0430;
 			};
 			buildConfigurationList = 6D9F920713AA132C009DEF37 /* Build configuration list for PBXProject "MadvertiseSDKSample" */;
 			compatibilityVersion = "Xcode 3.2";

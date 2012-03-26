@@ -56,10 +56,9 @@ typedef enum tagMadvertiseAdClass {
     MRAdViewPlacementType placementType;
   
     NSInteger responseCode;                                 // flag that indicates if http response from ad server is ok
-    bool isBannerMode;                                      // flag that indicates if the view shows a banner or a popup
     bool isExpanded;                                        // flag that indicates if there is an expanded ad action
   
-    UIWebView* currentView;                                 // one of the two views above, depending on user action
+    UIView* currentView;                                 // one of the two views above, depending on user action
   
     NSLock* lock;                                           // lock which is used to avoid race conditions while requesting an ad
 
@@ -78,15 +77,13 @@ typedef enum tagMadvertiseAdClass {
 @property (nonatomic, assign) id<MadvertiseDelegationProtocol> madDelegate;
 @property (nonatomic, retain) MadvertiseAd *currentAd;
 @property (nonatomic, retain) NSMutableURLRequest *request;
-@property (nonatomic, retain) UIWebView *currentView;
+@property (nonatomic, retain) UIView *currentView;
 @property (nonatomic, retain) NSTimer* timer;
 @property (nonatomic, retain) NSURLConnection *conn;
 @property (nonatomic, retain) NSMutableData* receivedData;
 
 
-- (CGSize) getScreenResolution;
 - (CGSize) getParentViewDimensions;
-- (NSString*) getDeviceOrientation;
 - (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh;
 - (void) createAdReloadTimer;
 - (void) displayView;

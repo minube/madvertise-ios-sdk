@@ -54,8 +54,6 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
 							 UserAgentString(),                                 MADVERTISE_USER_AGENT_KEY,
 							 action_type,                                       MADVERTISE_ACTION_TYPE_KEY,
                              [MadvertiseUtilities getIP],                       MADVERTISE_IP_KEY,
-                             [MadvertiseUtilities getDeviceIDMD5Hash],          MADVERTISE_UDIDMD5_KEY,
-                             [MadvertiseUtilities getDeviceIDSHA1Hash],         MADVERTISE_UDIDSHA1_KEY,
                              [MadvertiseUtilities getMacMD5Hash],               MADVERTISE_MACMD5_KEY,
                              [MadvertiseUtilities getMacSHA1Hash],              MADVERTISE_MACSHA1_KEY,
                              [MadvertiseUtilities getTimestamp],                MADVERTISE_TIMESTAMP_KEY,
