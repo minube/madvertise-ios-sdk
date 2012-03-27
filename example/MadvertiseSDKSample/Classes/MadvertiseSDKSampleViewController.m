@@ -50,27 +50,26 @@ MadvertiseView *ad;
 //    withClass: MadvertiseAdClassMMA : 320x53
 //               MadvertiseAdClassMediumRectangle : 300x250
 //               MadvertiseAdClassLeaderboard : 728x90
-//               MadvertiseAdClassFullscreen : 768x768
 //               MadvertiseAdClassPortrait : 766x66
 //               MadvertiseAdClassLandscape : 1024x66
-//               MadvertiseAdClassRichMedia : fullscreen richmedia ad (overlay)
+//               MadvertiseAdClassFullscreen : 768x768
 //    
 //    secondsToRefresh: the time after which a new ad will be loaded
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         /* run something specific for the iPad */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+//        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
     } else {
         /* run something specific for the iPhone */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
-//      ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInterstitial secondsToRefresh:30];
+//        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
+        
+        [ad place_at_x:0 y:0];
+        [self.view addSubview:ad];
+        [self.view bringSubviewToFront:ad];
     }
-    
-    [ad place_at_x:0 y:0];
-    [self.view addSubview:ad];
-    [self.view bringSubviewToFront:ad];
 }
 
 - (void) viewWillAppear:(BOOL)animated {

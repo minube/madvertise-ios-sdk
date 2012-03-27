@@ -23,26 +23,26 @@
   return @"TestTokn";
 }
 
-- (BOOL) debugEnabled {
-  return YES;
+- (BOOL) downloadTrackerEnabled {
+    return YES;
 }
 
-- (double) durationOfBannerAnimation {
-  return 1.0;
-}
+//- (BOOL) debugEnabled {
+//  return YES;
+//}
 
-- (MadvertiseAnimationClass) bannerAnimationTyp {
-  return MadvertiseAnimationClassFade;
-}
+//- (double) durationOfBannerAnimation {
+//  return 1.0;
+//}
+
+//- (MadvertiseAnimationClass) bannerAnimationTyp {
+//  return MadvertiseAnimationClassFade;
+//}
 
 //- (CLLocationCoordinate2D) location {
 //    CLLocationCoordinate2D _location = { 8.807081, 53.074981 };
 //    return _location;
 //}
-
-- (BOOL) downloadTrackerEnabled {
-  return YES;
-}
 
 //- (NSString*) age {
 //  return @"21";
@@ -52,8 +52,8 @@
 //  return @"M";
 //}
 
-- (BOOL) mRaidDisabled {
-    return NO;
-}
+//- (BOOL) mRaidDisabled {
+//    return NO;
+//}
 
 @end

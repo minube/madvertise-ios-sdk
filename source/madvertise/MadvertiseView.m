@@ -149,8 +149,6 @@ int const MadvertiseAdClass_toHeight[] = {
         x = 0;
         y = 0;
     }
-    
-    self.frame = CGRectMake(x_pos, y_pos, MadvertiseAdClass_toWidth[currentAdClass], MadvertiseAdClass_toHeight[currentAdClass]);
 }
 
 // helper method for initialization
@@ -160,23 +158,20 @@ int const MadvertiseAdClass_toHeight[] = {
     MadLog(@"madvertise SDK %@", MADVERTISE_SDK_VERION);
 
     self.clipsToBounds = YES;
-
-    // just a dummy placeholder
+    
     currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     [self addSubview: currentView];
+    [self setHidden:YES];
     
-    currentAdClass     = adClassValue;
-
+    currentAdClass      = adClassValue;
     interval            = secondsToRefresh;
     request             = nil;
     receivedData        = nil;
     responseCode        = 200;
     timer               = nil;
-      
-    isExpanded = false;
-    placementType = type;
-
-    madDelegate  = delegate;
+    isExpanded          = false;
+    placementType       = type;
+    madDelegate         = delegate;
 
     // load first ad
     lock = [[NSLock alloc] init];
@@ -185,7 +180,7 @@ int const MadvertiseAdClass_toHeight[] = {
 
     animationDuration = 0.75;
 
-    if([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
+    if ([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
       animationDuration = [madDelegate durationOfBannerAnimation];
     }
 
@@ -200,13 +195,11 @@ int const MadvertiseAdClass_toHeight[] = {
 
 #pragma mark - server connection handling
 
-// check, if response is OK
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     MadLog(@"%@ %i", @"Received response code: ", [response statusCode]);
     responseCode = [response statusCode];
     [receivedData setLength:0];
     
-    // debugging
     if ([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) {
         MadLog(@"%@",[[response allHeaderFields] objectForKey:@"X-Madvertise-Debug"]);
     }
@@ -234,7 +227,6 @@ int const MadvertiseAdClass_toHeight[] = {
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if (responseCode == 200 && !isExpanded) {
-        // parse response
         MadLog(@"Deserializing json");
         
         NSDictionary *dictionary = [receivedData objectFromJSONData];
@@ -450,14 +442,12 @@ int const MadvertiseAdClass_toHeight[] = {
     else {
         UIWebView* view = [[UIWebView alloc] initWithFrame:frame];
         [view setUserInteractionEnabled:NO];
-        
         view.delegate = self;
         [view loadHTMLString:[currentAd to_html] baseURL:nil];
         
         [self webViewDidFinishLoad:view];
-        
+        [self setHidden:NO];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
-        
         [self createAdReloadTimer];
     }
 }
@@ -593,6 +583,7 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)adDidLoad:(MRAdView *)adView {
+    [self setHidden:NO];
     [self swapView:adView oldView:currentView];
     [self createAdReloadTimer];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
@@ -600,6 +591,8 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView {
+    [self setHidden:YES];
+    [self createAdReloadTimer];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:adView];
 }
 
