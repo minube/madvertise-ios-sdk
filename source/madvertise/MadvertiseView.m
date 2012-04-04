@@ -346,9 +346,8 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)stopTimer {
-    MadLog(@"Stop Ad reload timer");
-    
     if (self.timer && [timer isValid]) {
+        MadLog(@"Stop Ad reload timer");
         [self.timer invalidate];
     }
 }
