@@ -66,13 +66,16 @@ int const MadvertiseAdClass_toHeight[] = {
   self.conn = nil;
   self.request = nil;
   self.receivedData = nil;
+    
+  if (mraidView) {
+    mraidView.delegate = nil;
+  }
 
   if (self.timer) {
     [self stopTimer];
     self.timer = nil;
   }
 
-  self.madDelegate = nil;
   if (currentView) {
       if ([currentView isKindOfClass:[UIWebView class]]) {
           ((UIWebView *)currentView).delegate = nil;
@@ -80,14 +83,12 @@ int const MadvertiseAdClass_toHeight[] = {
               [((UIWebView *)currentView) stopLoading];
           }
       }
-      currentView = nil;
+      [currentView release];currentView = nil;
   }
   
-    [currentAd release];
-  currentAd = nil;
-    
-  [lock release];
-  lock = nil;
+  [currentAd release];currentAd = nil;
+  [lock release];lock = nil;
+  [madDelegate release]; madDelegate = nil;
 
   [super dealloc];
 }
@@ -172,11 +173,11 @@ int const MadvertiseAdClass_toHeight[] = {
     isExpanded          = false;
     placementType       = type;
     madDelegate         = delegate;
+    [madDelegate retain];
 
     // load first ad
     lock = [[NSLock alloc] init];
     [self loadAd];
-    [self createAdReloadTimer];
 
     animationDuration = 0.75;
 
@@ -403,6 +404,9 @@ int const MadvertiseAdClass_toHeight[] = {
     if (aWebView != currentView) {
         [self swapView:aWebView oldView:currentView];
     }
+    
+    [self setHidden:NO];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
 }
 
 - (void) displayView {
@@ -426,7 +430,7 @@ int const MadvertiseAdClass_toHeight[] = {
     CGRect frame = CGRectMake(0, 0, ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
     
     if ([currentAd isRichMedia]) {
-        MRAdView *mraidView = [[MRAdView alloc] initWithFrame:frame 
+        mraidView = [[MRAdView alloc] initWithFrame:frame 
                                                 allowsExpansion:YES
                                                 closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
                                                 placementType:placementType];
@@ -445,9 +449,6 @@ int const MadvertiseAdClass_toHeight[] = {
         view.delegate = self;
         [view loadHTMLString:[currentAd to_html] baseURL:nil];
         
-        [self webViewDidFinishLoad:view];
-        [self setHidden:NO];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
         [self createAdReloadTimer];
     }
 }

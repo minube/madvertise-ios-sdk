@@ -20,16 +20,6 @@
 
 @implementation MadvertiseSDKSampleViewController
 
-MadvertiseView *ad;
-
-- (void)dealloc {
-    if (madvertiseDemoDelegate) {
-        [madvertiseDemoDelegate release];
-    }
-    
-    [super dealloc];
-}
-
 - (void)viewDidLoad {
   [super viewDidLoad];
   
@@ -43,7 +33,7 @@ MadvertiseView *ad;
 //                               - (NSString *) gender : should return the gender of the user
 //                               - (BOOL) mRaidDisabled : return YES to disable MRaid ads
     
-    madvertiseDemoDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
+    MadvertiseSDKSampleDelegate *madvertiseDemoDelegate = [[[MadvertiseSDKSampleDelegate alloc] init] autorelease];
     
 //    Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
 //
@@ -56,20 +46,22 @@ MadvertiseView *ad;
 //    
 //    secondsToRefresh: the time after which a new ad will be loaded
     
+    MadvertiseView *ad = nil;
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         /* run something specific for the iPad */
         
-//        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
     } else {
         /* run something specific for the iPhone */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInterstitial secondsToRefresh:30];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMediumRectangle placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
 //        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
-        
-        [ad place_at_x:0 y:0];
-        [self.view addSubview:ad];
-        [self.view bringSubviewToFront:ad];
     }
+    
+    [ad place_at_x:0 y:0];
+    [self.view addSubview:ad];
+    [self.view bringSubviewToFront:ad];
 }
 
 - (void) viewWillAppear:(BOOL)animated {

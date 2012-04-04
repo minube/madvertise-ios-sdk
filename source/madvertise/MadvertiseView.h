@@ -59,6 +59,7 @@ typedef enum tagMadvertiseAdClass {
     bool isExpanded;                                        // flag that indicates if there is an expanded ad action
   
     UIView* currentView;                                 // one of the two views above, depending on user action
+    MRAdView *mraidView;
   
     NSLock* lock;                                           // lock which is used to avoid race conditions while requesting an ad
 

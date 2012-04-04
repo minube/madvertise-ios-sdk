@@ -13,6 +13,7 @@
 #import "MRAdViewDisplayController.h"
 #import "MRCommand.h"
 #import "MRProperty.h"
+#import "MPGlobal.h"
 
 static NSString * const kExpandableCloseButtonImageName = @"MPCloseButtonX.png";
 static NSString * const kMraidURLScheme = @"mraid";
@@ -124,6 +125,9 @@ static NSString * const kMraidURLScheme = @"mraid";
 
 - (void)dealloc {
     _webView.delegate = nil;
+    if ([_webView respondsToSelector:@selector(stopLoading)]) {
+        [_webView stopLoading];
+    }
     [_webView release];
     [_closeButton release];
     [_data release];

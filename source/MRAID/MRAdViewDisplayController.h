@@ -55,7 +55,7 @@
 - (void)close;
 - (void)expandToFrame:(CGRect)frame withURL:(NSURL *)url 
        useCustomClose:(BOOL)shouldUseCustomClose isModal:(BOOL)isModal 
-shouldLockOrientation:(BOOL)shouldLockOrientation;
+       shouldLockOrientation:(BOOL)shouldLockOrientation;
 - (void)flipToFrame:(CGRect)frame withURL:(NSURL *)url 
        useCustomClose:(BOOL)shouldUseCustomClose isModal:(BOOL)isModal 
 shouldLockOrientation:(BOOL)shouldLockOrientation;
