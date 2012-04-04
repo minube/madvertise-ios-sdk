@@ -71,10 +71,7 @@ int const MadvertiseAdClass_toHeight[] = {
     mraidView.delegate = nil;
   }
 
-  if (self.timer) {
-    [self stopTimer];
-    self.timer = nil;
-  }
+  [self stopTimer];
 
   if (currentView) {
       if ([currentView isKindOfClass:[UIWebView class]]) {
@@ -134,14 +131,6 @@ int const MadvertiseAdClass_toHeight[] = {
     [[NSNotificationCenter defaultCenter] addObserver:observer selector:selector name:event object:nil];
 }
 
-- (void)removeFromSuperview {
-  [self retain];
-  [self stopTimer];
-  [currentView removeFromSuperview];
-  [super removeFromSuperview];
-  [self release];
-}
-
 - (void)place_at_x:(int) x_pos y:(int) y_pos {
     x = x_pos;
     y = y_pos;
@@ -169,7 +158,7 @@ int const MadvertiseAdClass_toHeight[] = {
     request             = nil;
     receivedData        = nil;
     responseCode        = 200;
-    timer               = nil;
+    self.timer          = nil;
     isExpanded          = false;
     placementType       = type;
     madDelegate         = delegate;
@@ -192,7 +181,6 @@ int const MadvertiseAdClass_toHeight[] = {
 
   return self;
 }
-
 
 #pragma mark - server connection handling
 
@@ -358,9 +346,10 @@ int const MadvertiseAdClass_toHeight[] = {
 }
 
 - (void)stopTimer {
+    MadLog(@"Stop Ad reload timer");
+    
     if (self.timer && [timer isValid]) {
         [self.timer invalidate];
-        self.timer = nil;
     }
 }
 
@@ -421,8 +410,6 @@ int const MadvertiseAdClass_toHeight[] = {
         return;
     }
     
-    [self stopTimer];
-    
     [self setUserInteractionEnabled:YES];
 
     self.frame = CGRectMake(x, y , ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
@@ -448,11 +435,8 @@ int const MadvertiseAdClass_toHeight[] = {
         [view setUserInteractionEnabled:NO];
         view.delegate = self;
         [view loadHTMLString:[currentAd to_html] baseURL:nil];
-        
-        [self createAdReloadTimer];
     }
 }
-
 
 - (void)openInAppBrowserWithUrl: (NSString*)url {
     [self stopTimer];
@@ -586,14 +570,12 @@ int const MadvertiseAdClass_toHeight[] = {
 - (void)adDidLoad:(MRAdView *)adView {
     [self setHidden:NO];
     [self swapView:adView oldView:currentView];
-    [self createAdReloadTimer];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView {
     [self setHidden:YES];
-    [self createAdReloadTimer];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:adView];
 }
 
@@ -644,7 +626,6 @@ int const MadvertiseAdClass_toHeight[] = {
 
 // Called just after the ad has expanded.
 - (void)didExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
-    [self stopTimer];
     isExpanded = true;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidExpand" object:adView];
 }

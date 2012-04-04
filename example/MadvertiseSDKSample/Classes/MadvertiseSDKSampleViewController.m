@@ -51,11 +51,11 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         /* run something specific for the iPad */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:60];
     } else {
         /* run something specific for the iPhone */
         
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMediumRectangle placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:60];
 //        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
     }
     
