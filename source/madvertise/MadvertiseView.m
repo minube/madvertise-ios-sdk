@@ -33,7 +33,8 @@ NSString * const MadvertiseAdClass_toString[] = {
   @"portrait",
   @"landscape",
   @"rich_media",
-  @"iphone_preloader"
+  @"iphone_preloader",
+  @"ipad_preloader"
 };
 
 int const MadvertiseAdClass_toWidth[] = {
@@ -44,7 +45,8 @@ int const MadvertiseAdClass_toWidth[] = {
     766,
     1024,
     320,
-    320
+    320,
+    1024
 };
 
 int const MadvertiseAdClass_toHeight[] = {
@@ -55,7 +57,8 @@ int const MadvertiseAdClass_toHeight[] = {
     66,
     66,
     480,
-    460
+    460,
+    748
 };
 
 // METHODS
