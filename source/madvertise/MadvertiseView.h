@@ -37,7 +37,8 @@ typedef enum tagMadvertiseAdClass {
   MadvertiseAdClassFullscreen,
   MadvertiseAdClassPortrait,
   MadvertiseAdClassLandscape,
-  MadvertiseAdClassRichMedia
+  MadvertiseAdClassRichMedia,
+  MadvertiseAdClassIphonePreloader
 } MadvertiseAdClass;
 
 @class InAppLandingPageController;

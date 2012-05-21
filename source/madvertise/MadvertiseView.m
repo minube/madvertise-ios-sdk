@@ -42,6 +42,7 @@ int const MadvertiseAdClass_toWidth[] = {
     768,
     766,
     1024,
+    320,
     320
 };
 
@@ -52,7 +53,8 @@ int const MadvertiseAdClass_toHeight[] = {
     768,
     66,
     66,
-    480
+    480,
+    460
 };
 
 // METHODS
