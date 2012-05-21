@@ -32,7 +32,8 @@ NSString * const MadvertiseAdClass_toString[] = {
   @"fullscreen",
   @"portrait",
   @"landscape",
-  @"rich_media"
+  @"rich_media",
+  @"iphone_preloader"
 };
 
 int const MadvertiseAdClass_toWidth[] = {
