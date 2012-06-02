@@ -79,6 +79,7 @@ typedef enum tagMadvertiseAdClass {
 
 @property (nonatomic, assign) id<MadvertiseDelegationProtocol> madDelegate;
 @property (nonatomic, retain) MadvertiseAd *currentAd;
+@property MadvertiseAdClass currentAdClass;
 @property (nonatomic, retain) NSMutableURLRequest *request;
 @property (nonatomic, retain) UIView *currentView;
 @property (nonatomic, retain) NSTimer* timer;
