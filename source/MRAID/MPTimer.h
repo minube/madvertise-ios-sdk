@@ -52,5 +52,6 @@
 }
 
 - (id)initWithNotificationName:(NSString *)name;
+- (void)postNotification;
 
 @end

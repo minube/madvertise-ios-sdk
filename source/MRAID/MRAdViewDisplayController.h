@@ -64,5 +64,6 @@ shouldLockOrientation:(BOOL)shouldLockOrientation;
 - (void)useCustomClose:(BOOL)shouldUseCustomClose;
 - (void)additionalModalViewWillPresent;
 - (void)additionalModalViewDidDismiss;
+- (void)closeButtonPressed;
 
 @end
