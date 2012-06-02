@@ -24,6 +24,7 @@
 @synthesize conn;
 @synthesize receivedData;
 @synthesize madDelegate;
+@synthesize currentAdClass;
 
 NSString * const MadvertiseAdClass_toString[] = {
   @"mma",
