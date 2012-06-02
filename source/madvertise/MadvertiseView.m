@@ -211,7 +211,7 @@ int const MadvertiseAdClass_toHeight[] = {
     MadLog(@"%@",[error description]);
 
     // dispatch status notification
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:[NSNumber numberWithInt:responseCode]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
 
     self.request = nil;
 }
@@ -234,7 +234,7 @@ int const MadvertiseAdClass_toHeight[] = {
         [self displayView];
     } else if (!isExpanded) {
         // dispatch status notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:[NSNumber numberWithInt:responseCode]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
     }
 
     self.request = nil;
@@ -401,7 +401,7 @@ int const MadvertiseAdClass_toHeight[] = {
     }
     
     [self setHidden:NO];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:self];
 }
 
 - (void) displayView {
@@ -576,7 +576,7 @@ int const MadvertiseAdClass_toHeight[] = {
 - (void)adDidLoad:(MRAdView *)adView {
     [self setHidden:NO];
     [self swapView:adView oldView:currentView];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:[NSNumber numberWithInt:responseCode]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
 }
 
