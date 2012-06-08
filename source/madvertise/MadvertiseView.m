@@ -570,88 +570,88 @@ int const MadvertiseAdClass_toHeight[] = {
 #pragma mark MRAdViewControllerDelegate
 
 - (void)closeButtonPressed {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdClosed" object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdClosed" object:self];
 }
 
 - (void)adDidLoad:(MRAdView *)adView {
     [self setHidden:NO];
     [self swapView:adView oldView:currentView];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:self];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:self];
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView {
     [self setHidden:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:self];
 }
 
 - (void)appShouldSuspendForAd:(MRAdView *)adView {
     [self stopTimer];
     isExpanded = true;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAppShouldSuspend" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAppShouldSuspend" object:self];
 }
 
 - (void)appShouldResumeFromAd:(MRAdView *)adView {
     isExpanded = false;
     [self createAdReloadTimer];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAppShouldResume" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAppShouldResume" object:self];
 }
 
 // Called just before the ad is displayed on-screen.
 - (void)adWillShow:(MRAdView *)adView {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillShow" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillShow" object:self];
 }
 
 // Called just after the ad has been displayed on-screen.
 - (void)adDidShow:(MRAdView *)adView {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidShow" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidShow" object:self];
 }
 
 // Called just before the ad is hidden.
 - (void)adWillHide:(MRAdView *)adView {
     [self stopTimer];
     isExpanded = true;
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillHide" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillHide" object:self];
 }
 
 // Called just after the ad has been hidden.
 - (void)adDidHide:(MRAdView *)adView {    
     self.frame = CGRectMake(x, y , 0, 0);
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidHide" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidHide" object:self];
 }
 
 // Called just before the ad expands.
 - (void)willExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
     [self stopTimer];
     isExpanded = true;
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillExpand" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillExpand" object:self];
 }
 
 // Called just after the ad has expanded.
 - (void)didExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
     isExpanded = true;
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidExpand" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidExpand" object:self];
 }
 
 // Called just before the ad closes.
 - (void)adWillClose:(MRAdView *)adView {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillClose" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillClose" object:self];
 }
 
 // Called just after the ad has closed.
 - (void)adDidClose:(MRAdView *)adView {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidClose" object:adView];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidClose" object:self];
 }
 
 - (void)ad:(MRAdView *)adView didRequestCustomCloseEnabled:(BOOL)enabled {
     if (enabled) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidRequestCustomClose" object:adView];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidRequestCustomClose" object:self];
     }
     else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidNotRequestCustomClose" object:adView];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidNotRequestCustomClose" object:self];
     }
 }
 

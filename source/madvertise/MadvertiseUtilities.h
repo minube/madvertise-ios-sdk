@@ -31,7 +31,7 @@
 #define MadLog(format, ...)
 #endif
 
-#define MADVERTISE_SDK_VERION @"5.0.3"
+#define MADVERTISE_SDK_VERION @"5.0.4"
 
 #define MADVERTISE_USER_AGENT_KEY @"ua"
 #define MADVERTISE_APP_KEY @"app"

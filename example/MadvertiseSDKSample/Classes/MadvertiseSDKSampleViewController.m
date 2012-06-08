@@ -89,11 +89,11 @@
 #pragma mark Notifications
 
 - (void) onAdLoadedSuccessfully:(NSNotification*)notify {
-    MadLog(@"successfully loaded with code: %@",[notify object]);
+    MadLog(@"ad successfully loaded");
 }
 
 - (void) onAdLoadedFailed:(NSNotification*)notify {
-    MadLog(@"ad load faild with code: %@",[notify object]);
+    MadLog(@"ad load failed");
 }
 
 @end
