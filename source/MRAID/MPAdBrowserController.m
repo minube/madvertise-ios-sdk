@@ -41,6 +41,8 @@ static NSArray *BROWSER_SCHEMES, *SPECIAL_HOSTS;
 	SPECIAL_HOSTS = [[NSArray arrayWithObjects:
 					  @"phobos.apple.com",
 					  @"maps.google.com",
+                      @"itunes.apple.com",
+                      @"www.youtube.com",
 					  nil] retain];
 }
 

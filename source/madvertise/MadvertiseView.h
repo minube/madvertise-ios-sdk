@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,6 @@
 // limitations under the License.
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
-#import <netinet/in.h>
-#import <CommonCrypto/CommonHMAC.h>
-#import <CommonCrypto/CommonDigest.h>
 #import <QuartzCore/CAAnimation.h>
 #import <QuartzCore/CAMediaTimingFunction.h>
 
@@ -31,78 +27,64 @@
 
 // enum of available banner formats
 typedef enum tagMadvertiseAdClass {
-  MadvertiseAdClassMMA,
-  MadvertiseAdClassMediumRectangle,
-  MadvertiseAdClassLeaderboard,
-  MadvertiseAdClassFullscreen,
-  MadvertiseAdClassPortrait,
-  MadvertiseAdClassLandscape,
-  MadvertiseAdClassRichMedia,
-  MadvertiseAdClassIphonePreloader,
-  MadvertiseAdClassIpadPreloader
+    MadvertiseAdClassMMA,
+    MadvertiseAdClassMediumRectangle,
+    MadvertiseAdClassLeaderboard,
+    MadvertiseAdClassFullscreen,
+    MadvertiseAdClassPortrait,
+    MadvertiseAdClassLandscape,
+    MadvertiseAdClassRichMedia,
+    MadvertiseAdClassIphonePreloader,
+    MadvertiseAdClassIpadPreloader,
+    MadvertiseAdClassIphonePreloaderLandscape,
+    MadvertiseAdClassIpadPreloaderPortrait
 } MadvertiseAdClass;
 
-@class InAppLandingPageController;
 @class MadvertiseAd;
 
-@interface MadvertiseView : UIView<UIWebViewDelegate, MPAdBrowserControllerDelegate, MRAdViewDelegate> {
-  
-    // attributes
-    id<MadvertiseDelegationProtocol> madDelegate;           // the delegate which receives ad related events like: adLoaded or adLoadFailed
-    NSMutableData* receivedData;                            // data received thorugh the connection to the ad server
+@interface MadvertiseView : UIView<MRAdViewDelegate> {
+    id<MadvertiseDelegationProtocol> madDelegate;
+    NSMutableData* receivedData;
     NSMutableURLRequest* request;  
-    NSURLConnection *conn;                                  // current request object
-  
-    MadvertiseAd* currentAd;                                // current ad
-    MadvertiseAdClass currentAdClass;                       // ad type
+    NSURLConnection *conn;
+    MadvertiseAdClass currentAdClass;
     MRAdViewPlacementType placementType;
-  
-    NSInteger responseCode;                                 // flag that indicates if http response from ad server is ok
-    bool isExpanded;                                        // flag that indicates if there is an expanded ad action
-  
-    UIView* currentView;                                 // one of the two views above, depending on user action
-    MRAdView *mraidView;
-  
-    NSLock* lock;                                           // lock which is used to avoid race conditions while requesting an ad
-
-    NSTimer* timer;                                         // the ad rotation timer
-    double interval;                                        // interval of ad refresh
-    int x, y;                                               // Position
-  
+    NSInteger responseCode;
+    MRAdView* currentView;
+    MRAdView* nextView;
+    NSLock* lock;
+    NSTimer* timer;
+    double interval;
+    Boolean reload;
+    int x, y;
     double animationDuration;
+    MadvertiseAnimationClass animationType;
+    Boolean suspended;
+    NSString *server_url;
 }
 
-
-/////////////////
-/// constructor
-////////////////
-
 @property (nonatomic, assign) id<MadvertiseDelegationProtocol> madDelegate;
-@property (nonatomic, retain) MadvertiseAd *currentAd;
 @property MadvertiseAdClass currentAdClass;
 @property (nonatomic, retain) NSMutableURLRequest *request;
-@property (nonatomic, retain) UIView *currentView;
-@property (nonatomic, retain) NSTimer* timer;
+@property (nonatomic, retain) MRAdView *currentView;
+@property (nonatomic, retain) MRAdView *nextView;
+@property (nonatomic, retain) NSTimer *timer;
 @property (nonatomic, retain) NSURLConnection *conn;
-@property (nonatomic, retain) NSMutableData* receivedData;
+@property (nonatomic, retain) NSMutableData *receivedData;
 
-
-- (CGSize) getParentViewDimensions;
 - (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh;
-- (void) createAdReloadTimer;
-- (void) displayView;
-- (void) stopTimer;
-- (void)swapView:(UIView*)newView oldView:(UIView*) oldView;
-- (void)loadAd;
-- (void)openInAppBrowserWithUrl:(NSString*)url;
+- (CGSize)getParentViewDimensions;
 
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh;
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh;
++ (MadvertiseView*)loadBannerWithDelegate:(id<MadvertiseDelegationProtocol>)delegate secondsToRefresh:(int)secondsToRefresh;
 + (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate;
-+ (void) handlerWithObserver:(id) observer AndSelector:(SEL) selector ForEvent:(NSString*) event;
-- (void)place_at_x:(int)x_pos y:(int)y_pos;               // position the frame for the view
++ (MadvertiseView*)loadPreloaderAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate closeButton:(Boolean)close timeToClose:(int)time;
++ (MadvertiseView*)loadPreloaderAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate closeButton:(Boolean)close;
++ (MadvertiseView*)loadPreloaderAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate;
+
++ (void)handlerWithObserver:(id) observer AndSelector:(SEL) selector ForEvent:(NSString*) event;
+- (void)place_at_x:(int)x_pos y:(int)y_pos;
 - (UIViewController *)viewControllerForPresentingModalView;
-- (void)dismissBrowserController:(MPAdBrowserController *)browserController;
-- (void)dismissBrowserController:(MPAdBrowserController *)browserController animated:(BOOL)animated;
 
 @end

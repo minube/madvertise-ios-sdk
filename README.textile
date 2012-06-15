@@ -1,4 +1,4 @@
-h1. madvertise iOS SDK (Version 5.0.4)
+h1. madvertise iOS SDK (Version 5.1.0)
 
 h2. Intro
 
@@ -27,7 +27,6 @@ h2. Preparations
   * UIKit.framework
   * CoreGraphics.framework
   * QuartzCore.framework
-  * Security.framework
 
 * Sign up at [madvertise](https://app.madvertise.de/register)
   * If you don't have already an account, please sign up.
@@ -60,6 +59,11 @@ This is why madvertise decided to make all SDKs public as open source projects. 
 
 
 h2. Change log
+
+v5.1.0
+
+* enhanced preloader support
+* a lot of bugfixes
 
 v5.0.0
 

@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ NSString* UserAgentString() {
 
 @implementation MadvertiseUtilities
 
-
 + (NSString *) getIP {
 	NSString *result = nil;
 	
@@ -57,7 +56,6 @@ NSString* UserAgentString() {
 					result = [ip copy];
 				}
 				if(![interface isEqualToString:@"lo0"] && ![interface isEqualToString:@"en0"] && ![interface isEqualToString:@"fw0"] && ![interface isEqualToString:@"en1"] ) {
-					// NSLog(@"Interface %@", interface);
 					result = [ip copy];
 				}
         [ip release];

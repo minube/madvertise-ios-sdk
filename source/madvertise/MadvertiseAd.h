@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,12 +21,11 @@
     NSString* richmediaUrl;
     NSString* richmediaMarkup;
     NSArray* trackingArray;
-  
     NSString* text;
+    NSString* markup;
     bool isRichMedia;
     bool isMraid;
     bool hasBanner;
-    bool shouldOpenInAppBrowser;
     int width;
     int height;
 }
@@ -37,18 +36,18 @@
 @property(nonatomic,retain) NSString *richmediaUrl;
 @property(nonatomic,retain) NSString *richmediaMarkup;
 @property(nonatomic,retain) NSString *text;
-@property(nonatomic,retain) NSArray *trackingArray;
+@property(nonatomic,retain) NSString *markup;
+@property(nonatomic,retain) NSArray  *trackingArray;
 
 @property bool isRichMedia;
 @property bool hasBanner;
-@property bool shouldOpenInAppBrowser;
 @property int height;
 @property int width;
 
-
-- (MadvertiseAd*)initFromDictionary:(NSDictionary*) dictionary;
-- (NSString*)to_html;
-- (Boolean)isLoadableViaUrl;
-- (NSURL*)url;
+- (MadvertiseAd*) initFromDictionary:(NSDictionary*) dictionary;
+- (NSString*) to_html;
+- (Boolean) isLoadableViaUrl;
+- (NSURL*) url;
+- (Boolean)isValid;
 
 @end

@@ -1,10 +1,16 @@
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
-//  MadTracker.m
-//  MadvertiseTracking
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//  Created by Moritz Becker on 11/1/10.
-//  Copyright 2010 Madvertise. All rights reserved.
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #import <sys/types.h>
 #import <sys/socket.h>
@@ -15,14 +21,12 @@
 #import "MadvertiseUtilities.h"
 #import "MadvertiseTracker.h"
 
-
 // static variables
 static BOOL madvertiseTrackerDebugMode = YES;
 static BOOL trackerAlreadyEnabled = NO;
 
 static NSString *productToken = @"test";
 static NSString *madServer = @"http://ad.madvertise.de/action/";
-//static NSString *madServer = @"http://127.0.0.1:9292/action/";
 
 @implementation MadvertiseTracker
 
@@ -59,6 +63,8 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
                              [MadvertiseUtilities getTimestamp],                MADVERTISE_TIMESTAMP_KEY,
                              [MadvertiseUtilities getAppName],                  MADVERTISE_APP_NAME_KEY,
                              [MadvertiseUtilities getAppVersion],               MADVERTISE_APP_VERSION_KEY,
+                             @"iPhone-SDK ",                                    MADVERTISE_REQUESTER_KEY,
+                             MADVERTISE_SDK_VERION,                             MADVERTISE_SDK_VERION_KEY,
                              (madvertiseTrackerDebugMode ? @"true" : @"false"), MADVERTISE_DEBUG_KEY,
                              nil];
     

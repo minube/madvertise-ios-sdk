@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 @implementation MadvertiseSDKSampleViewController
 
 - (void)viewDidLoad {
-  [super viewDidLoad];
-  
-//    Create a new MadvertiseSDKSampleDelegate.
+    [super viewDidLoad];
+
+//    1. Create a new MadvertiseSDKSampleDelegate.
 //    
 //    Some possible delegate methods:
 //                               - (NSString *) appId : should return your SiteToken
@@ -32,48 +32,46 @@
 //                               - (NSString*) age : should return the age of the user
 //                               - (NSString *) gender : should return the gender of the user
 //                               - (BOOL) mRaidDisabled : return YES to disable MRaid ads
-    
+
     MadvertiseSDKSampleDelegate *madvertiseDemoDelegate = [[[MadvertiseSDKSampleDelegate alloc] init] autorelease];
     
-//    Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
+//    2. Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
 //
 //    withClass: MadvertiseAdClassMMA : 320x53
 //               MadvertiseAdClassMediumRectangle : 300x250
 //               MadvertiseAdClassLeaderboard : 728x90
 //               MadvertiseAdClassPortrait : 766x66
 //               MadvertiseAdClassLandscape : 1024x66
-//               MadvertiseAdClassFullscreen : 768x768
 //    
 //    secondsToRefresh: the time after which a new ad will be loaded
-    
-    MadvertiseView *ad = nil;
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        /* run something specific for the iPad */
-        
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:60];
-    } else {
-        /* run something specific for the iPhone */
-        
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:60];
-//        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
-    }
-    
-    [ad place_at_x:0 y:0];
-    [self.view addSubview:ad];
-    [self.view bringSubviewToFront:ad];
+
+    // custom banner format ad
+//    MadvertiseView *customBanner = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
+//    [customBanner place_at_x:0 y:0];
+//    [self.view addSubview:customBanner];
+//    [self.view bringSubviewToFront:customBanner];
+
+    // ad with standard banner format
+    MadvertiseView *banner = [MadvertiseView loadBannerWithDelegate:madvertiseDemoDelegate secondsToRefresh:30];
+    [banner place_at_x:0 y:0];
+    [self.view addSubview:banner];
+    [self.view bringSubviewToFront:banner];
+
+    // richmedia ad (overlay)
+//    MadvertiseView *richmedia = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+//    [self.view addSubview:richmedia];
+//    [self.view bringSubviewToFront:richmedia];
+
+    // preloader
+//    MadvertiseView *preloader = [MadvertiseView loadPreloaderAdWithDelegate:madvertiseDemoDelegate];
+//    [self.view addSubview:preloader];
+//    [self.view bringSubviewToFront:preloader];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
 //  observing adLoaded and adLoadFailed Events
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:) ForEvent:@"MadvertiseAdLoaded"];
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:) ForEvent:@"MadvertiseAdLoadFailed"];
-    
-//  furthermore it is possible to observe the following MRaid events:
-//            MadvertiseMRaidAppShouldSuspend : app should suspend (there will be an ad event)
-//            MadvertiseMRaidAppShouldResume : app should resume
-//    
-//  Please see MadvertiseView.m for more events.  
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -83,7 +81,6 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
-
 
 #pragma mark - 
 #pragma mark Notifications

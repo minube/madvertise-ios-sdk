@@ -25,4 +25,3 @@ It furthermore uses the following software :
 
 - JSONKit (https://github.com/johnezang/JSONKit) : BSD License / Apache License, Version 2.0
 - MoPub iOS SDK (https://github.com/mopub/mopub-client/tree/master/MoPubiOS) : New BSD License
-- SFHFKeychainUtils (https://github.com/jayway/SFHFKeychainUtils)
