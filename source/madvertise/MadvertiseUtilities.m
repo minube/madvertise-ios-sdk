@@ -204,4 +204,12 @@ NSString* UserAgentString() {
     }
 }
 
++ (NSString *)urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string {
+	return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                (CFStringRef)string,
+                                                                NULL,
+                                                                (CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ",
+                                                                CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
+}
+
 @end

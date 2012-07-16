@@ -152,7 +152,7 @@ int const MadvertiseAdClass_toHeight[] = {
     [nextView release]; nextView = nil;
 
     [lock release]; lock = nil;
-    [madDelegate release]; madDelegate = nil;
+    madDelegate = nil;
 
     [super dealloc];
 }
@@ -164,16 +164,18 @@ int const MadvertiseAdClass_toHeight[] = {
     enableDebug = YES;
 #endif
 
+    madDelegate = delegate;
+
     // debugging
-    if ([delegate respondsToSelector:@selector(debugEnabled)]) {
-        enableDebug = [delegate debugEnabled];
+    if ([madDelegate respondsToSelector:@selector(debugEnabled)]) {
+        enableDebug = [madDelegate debugEnabled];
     }
 
     // Download-Tracker
-    if ([delegate respondsToSelector:@selector(downloadTrackerEnabled)]) {
-        if ([delegate downloadTrackerEnabled] == YES) {
+    if ([madDelegate respondsToSelector:@selector(downloadTrackerEnabled)] && [madDelegate respondsToSelector:@selector(appId)]) {
+        if ([madDelegate downloadTrackerEnabled] == YES) {
             [MadvertiseTracker setDebugMode: enableDebug];
-            [MadvertiseTracker setProductToken:[delegate appId]];
+            [MadvertiseTracker setProductToken:[madDelegate appId]];
             [MadvertiseTracker enable];
         }
     }
@@ -200,8 +202,6 @@ int const MadvertiseAdClass_toHeight[] = {
         animationType       = MadvertiseAnimationClassCurlDown;
         server_url          = @"http://ad.madvertise.de";
         lock                = [[NSLock alloc] init];
-        madDelegate         = delegate;
-        [madDelegate retain];
 
         if ([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
             animationDuration = [madDelegate durationOfBannerAnimation];
@@ -227,17 +227,13 @@ int const MadvertiseAdClass_toHeight[] = {
             reload = NO;
         }
 
-        if ([madDelegate respondsToSelector:@selector(appId)]) {
-            // load first ad
-            [self loadAd];
+        // load first ad
+        [self loadAd];
             
-            // Notifications for reloadable ad classes
-            if (reload) {
-                [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stopTimer) name:UIApplicationDidEnterBackgroundNotification object:nil];
-                [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(createAdReloadTimer) name:UIApplicationDidBecomeActiveNotification object:nil];   
-            }
-        } else {
-            MadLog(@"Delegate does not respond to appId! We're not able to load ads without appId.");
+        // Notifications for reloadable ad classes
+        if (reload) {
+            [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stopTimer) name:UIApplicationDidEnterBackgroundNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(createAdReloadTimer) name:UIApplicationDidBecomeActiveNotification object:nil];
         }
     }
 
@@ -358,7 +354,7 @@ int const MadvertiseAdClass_toHeight[] = {
     [post_params setValue: [NSNumber numberWithFloat:screen_size.width]  forKey:MADVERTISE_DEVICE_WIDTH_KEY];
     [post_params setValue: [NSNumber numberWithFloat:screen_size.height] forKey:MADVERTISE_DEVICE_HEIGHT_KEY];
     [post_params setValue: [MadvertiseUtilities getDeviceOrientation]    forKey:MADVERTISE_ORIENTATION_KEY];
-    [post_params setValue: [UserAgentString() urlEncodeUsingEncoding:NSUTF8StringEncoding] forKey:MADVERTISE_USER_AGENT_KEY];
+    [post_params setValue: [MadvertiseUtilities urlEncodeUsingEncoding:NSUTF8StringEncoding withString:UserAgentString()] forKey:MADVERTISE_USER_AGENT_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
 
     if (!([madDelegate respondsToSelector:@selector(mRaidDisabled)] && [madDelegate mRaidDisabled])) {
@@ -448,9 +444,9 @@ int const MadvertiseAdClass_toHeight[] = {
     CGRect frame = CGRectMake(0, 0, ([ad width] != 0) ? [ad width] : MadvertiseAdClass_toWidth[currentAdClass], ([ad height] != 0) ? [ad height] : MadvertiseAdClass_toHeight[currentAdClass]);
 
     nextView = [[MRAdView alloc] initWithFrame:frame 
-                                allowsExpansion:YES
-                               closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
-                                  placementType:placementType];
+                               allowsExpansion:YES
+                              closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
+                                 placementType:placementType];
     nextView.delegate = self;
 
     if ([ad isLoadableViaUrl]) {

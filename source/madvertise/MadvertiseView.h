@@ -21,7 +21,6 @@
 #import "MadvertiseTracker.h"
 #import "MadvertiseDelegationProtocol.h"
 #import "JSONKit.h"
-#import "NSString+URLEncoding.h"
 #import "MRAdView.h"
 #import "MPAdBrowserController.h"
 

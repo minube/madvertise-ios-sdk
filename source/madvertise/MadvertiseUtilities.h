@@ -73,6 +73,7 @@ NSString *UserAgentString(void);
 + (NSString*) getAppVersion;
 + (CGSize)    getScreenResolution;
 + (NSString*) getDeviceOrientation;
++ (NSString*) urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string;
 
 + (void)logWithPath:(char *)path line:(NSUInteger)line string:(NSString *)format, ...;
 

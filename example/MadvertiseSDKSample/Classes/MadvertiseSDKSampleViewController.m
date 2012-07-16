@@ -33,7 +33,7 @@
 //                               - (NSString *) gender : should return the gender of the user
 //                               - (BOOL) mRaidDisabled : return YES to disable MRaid ads
 
-    MadvertiseSDKSampleDelegate *madvertiseDemoDelegate = [[[MadvertiseSDKSampleDelegate alloc] init] autorelease];
+    madDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
     
 //    2. Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
 //
@@ -46,32 +46,40 @@
 //    secondsToRefresh: the time after which a new ad will be loaded
 
     // custom banner format ad
-//    MadvertiseView *customBanner = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
-//    [customBanner place_at_x:0 y:0];
-//    [self.view addSubview:customBanner];
-//    [self.view bringSubviewToFront:customBanner];
+    ad = [MadvertiseView loadAdWithDelegate:madDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
+    [ad place_at_x:0 y:0];
+    [self.view addSubview:ad];
+    [self.view bringSubviewToFront:ad];
 
     // ad with standard banner format
-    MadvertiseView *banner = [MadvertiseView loadBannerWithDelegate:madvertiseDemoDelegate secondsToRefresh:30];
-    [banner place_at_x:0 y:0];
-    [self.view addSubview:banner];
-    [self.view bringSubviewToFront:banner];
+//    ad = [MadvertiseView loadBannerWithDelegate:madDelegate secondsToRefresh:30];
+//    [ad place_at_x:0 y:0];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
 
     // richmedia ad (overlay)
-//    MadvertiseView *richmedia = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
-//    [self.view addSubview:richmedia];
-//    [self.view bringSubviewToFront:richmedia];
+//    ad = [MadvertiseView loadRichMediaAdWithDelegate:madDelegate];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
 
     // preloader
-//    MadvertiseView *preloader = [MadvertiseView loadPreloaderAdWithDelegate:madvertiseDemoDelegate];
-//    [self.view addSubview:preloader];
-//    [self.view bringSubviewToFront:preloader];
+//    ad = [MadvertiseView loadPreloaderAdWithDelegate:madDelegate];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
 //  observing adLoaded and adLoadFailed Events
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:) ForEvent:@"MadvertiseAdLoaded"];
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:) ForEvent:@"MadvertiseAdLoadFailed"];
+}
+
+- (void)viewDidUnload {
+    ad.madDelegate = nil;
+    [ad release]; ad = nil;
+    [madDelegate release]; madDelegate = nil;
+    
+    [super viewDidUnload];
 }
 
 - (void) viewWillDisappear:(BOOL)animated {

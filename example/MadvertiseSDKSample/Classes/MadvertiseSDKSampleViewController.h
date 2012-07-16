@@ -17,6 +17,8 @@
 #import "MadvertiseView.h"
 
 @interface MadvertiseSDKSampleViewController : UIViewController {
+    MadvertiseSDKSampleDelegate *madDelegate;
+    MadvertiseView *ad;
 }
 
 @end
