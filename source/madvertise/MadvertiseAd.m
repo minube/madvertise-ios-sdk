@@ -39,6 +39,7 @@
       text      = [([dictionary objectForKey:@"text"] ?: @"") retain];
       hasBanner = [[dictionary objectForKey:@"has_banner"] boolValue];
       markup    = [([dictionary objectForKey:@"markup"] ?: @"") retain];
+      shouldOpenInAppBrowser = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
       
       trackingArray = [dictionary objectForKey:@"tracking"];
       [trackingArray retain];
@@ -112,7 +113,11 @@
     NSString* body = @"";
 
     if (self.bannerUrl) {
-        body = [NSString stringWithFormat:@"<img src=\"%@\" onclick=\"mraid.open(\'%@\')\"></img>%@", self.bannerUrl, self.clickUrl, [self trackingHtml]];
+        if (shouldOpenInAppBrowser) {
+            body = [NSString stringWithFormat:@"<img src=\"%@\" onclick=\"mraid.open(\'%@\')\"></img>%@", self.bannerUrl, self.clickUrl, [self trackingHtml]];
+        } else {
+            body = [NSString stringWithFormat:@"<a href=\"%@\"><img src=\"%@\"></img></a>%@", self.clickUrl, self.bannerUrl, [self trackingHtml]];
+        }
     }
 
     return [NSString stringWithFormat:template, body];

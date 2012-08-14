@@ -74,6 +74,8 @@ NSString *UserAgentString(void);
 + (CGSize)    getScreenResolution;
 + (NSString*) getDeviceOrientation;
 + (NSString*) urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string;
++ (BOOL)      isConnectionAvailable;
++ (void)      synchronizeWithSafari;
 
 + (void)logWithPath:(char *)path line:(NSUInteger)line string:(NSString *)format, ...;
 

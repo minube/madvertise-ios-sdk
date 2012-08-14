@@ -34,6 +34,7 @@
 		4D3A1887151B966200E0D347 /* MPAdBrowserController.xib in Headers */ = {isa = PBXBuildFile; fileRef = 4D059B4614FE674700BB8173 /* MPAdBrowserController.xib */; };
 		4D5944FF15B051AC00105993 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D5944FD15B051AC00105993 /* JSONKit.h */; };
 		4D59450015B051AC00105993 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5944FE15B051AC00105993 /* JSONKit.m */; };
+		4D62D12A15DA7B2800CE826C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D62D12915DA7B2800CE826C /* SystemConfiguration.framework */; };
 		5B4E248813F0323700F67F5A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B0A658013EFEA7B0032A2DD /* Foundation.framework */; };
 		5B63957013F40F4E003D95AF /* MadvertiseAd.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B63956C13F40F4E003D95AF /* MadvertiseAd.h */; };
 		5B63957213F40F4E003D95AF /* MadvertiseTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B63956E13F40F4E003D95AF /* MadvertiseTracker.h */; };
@@ -76,6 +77,7 @@
 		4D0A078414F5357E00852970 /* UIWebView+MPAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+MPAdditions.m"; sourceTree = "<group>"; };
 		4D5944FD15B051AC00105993 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = SOURCE_ROOT; };
 		4D5944FE15B051AC00105993 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = SOURCE_ROOT; };
+		4D62D12915DA7B2800CE826C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		4DB4087C14FE6BB900E44C4E /* MRAID.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MRAID.bundle; sourceTree = "<group>"; };
 		5B0A658013EFEA7B0032A2DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5B0A65C913F00B660032A2DD /* MadvertiseDelegationProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MadvertiseDelegationProtocol.h; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D62D12A15DA7B2800CE826C /* SystemConfiguration.framework in Frameworks */,
 				5B4E248813F0323700F67F5A /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -157,6 +160,7 @@
 		5B0A657213EFEA7B0032A2DD = {
 			isa = PBXGroup;
 			children = (
+				4D62D12915DA7B2800CE826C /* SystemConfiguration.framework */,
 				5B0A658213EFEA7B0032A2DD /* madvertise-ios-sdk */,
 				5B0A657F13EFEA7B0032A2DD /* Frameworks */,
 				5B0A657E13EFEA7B0032A2DD /* Products */,

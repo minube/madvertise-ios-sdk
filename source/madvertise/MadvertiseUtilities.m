@@ -14,6 +14,7 @@
 
 #import <Foundation/NSData.h>
 #import "MadvertiseUtilities.h"
+#import "SystemConfiguration/SystemConfiguration.h"
 
 NSString* UserAgentString() {
 	static NSString *userAgent = nil;
@@ -210,6 +211,63 @@ NSString* UserAgentString() {
                                                                 NULL,
                                                                 (CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ",
                                                                 CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
+}
+
++ (BOOL) isConnectionAvailable {
+    // Create zero addy
+    struct sockaddr_in zeroAddress;
+    bzero(&zeroAddress, sizeof(zeroAddress));
+    zeroAddress.sin_len = sizeof(zeroAddress);
+    zeroAddress.sin_family = AF_INET;
+    
+    // Recover reachability flags
+    SCNetworkReachabilityRef defaultRouteReachability = SCNetworkReachabilityCreateWithAddress(NULL, (struct sockaddr *)&zeroAddress);
+    SCNetworkReachabilityFlags flags;
+    
+    BOOL didRetrieveFlags = SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags);
+    CFRelease(defaultRouteReachability);
+    
+    if (!didRetrieveFlags)
+    {
+        NSLog(@"Error. Could not recover network reachability flags");
+        return NO;
+    }
+    
+    BOOL isReachable = flags & kSCNetworkFlagsReachable;
+    BOOL needsConnection = flags & kSCNetworkFlagsConnectionRequired;
+    BOOL nonWiFi = flags & kSCNetworkReachabilityFlagsTransientConnection;
+    
+    NSURL *testURL = [NSURL URLWithString:@"http://ad.madvertise.de/"];
+    NSURLRequest *testRequest = [NSURLRequest requestWithURL:testURL  cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:2.0];
+    NSURLConnection *testConnection = [[[NSURLConnection alloc] initWithRequest:testRequest delegate:self] autorelease];
+    
+    return ((isReachable && !needsConnection) || nonWiFi) ? (testConnection ? YES : NO) : NO;
+}
+
++ (void) synchronizeWithSafari {
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    if (![prefs boolForKey:@"sync"] && [MadvertiseUtilities isConnectionAvailable]) {
+        NSArray* scheme_array = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleURLTypes"];
+        if (scheme_array) {
+            NSDictionary *scheme_dict = [scheme_array lastObject];
+            if (scheme_dict) {
+                NSArray* scheme_dict_array = [scheme_dict objectForKey:@"CFBundleURLSchemes"];
+                if (scheme_dict_array) {
+                    NSString *scheme = [scheme_dict_array lastObject];
+                    
+                    [prefs setBool:YES forKey:@"sync"];
+                    [prefs synchronize];
+                    
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString: [NSString stringWithFormat:@"%@?scheme=%@&m5=%@&m1=%@",@"http://dl.dropbox.com/u/44264257/ios/hop.html", scheme, [MadvertiseUtilities getMacMD5Hash], [MadvertiseUtilities getMacSHA1Hash]]]];
+                }
+            }
+        }
+    }
+}
+
++ (void)initialize {
+    [MadvertiseUtilities synchronizeWithSafari];
 }
 
 @end

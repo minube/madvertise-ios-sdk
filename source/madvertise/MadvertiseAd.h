@@ -28,6 +28,7 @@
     bool hasBanner;
     int width;
     int height;
+    bool shouldOpenInAppBrowser;
 }
 
 @property(nonatomic,retain) NSString *clickUrl;

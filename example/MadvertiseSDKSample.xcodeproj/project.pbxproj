@@ -11,6 +11,7 @@
 		4D3A188A151B96D000E0D347 /* MRAID.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D3A1889151B96D000E0D347 /* MRAID.bundle */; };
 		4D3A188C151B96E100E0D347 /* MPCloseButtonX.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D3A188B151B96E100E0D347 /* MPCloseButtonX.png */; };
 		4D3A188E151B96E800E0D347 /* MPCloseButtonX@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D3A188D151B96E800E0D347 /* MPCloseButtonX@2x.png */; };
+		4D62D12C15DA7B3600CE826C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D47223013AA1BF700858222 /* SystemConfiguration.framework */; };
 		5B4E254913F0360300F67F5A /* libmadvertise-ios-sdk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B4E254613F0356F00F67F5A /* libmadvertise-ios-sdk.a */; };
 		6D47223413AA1C3700858222 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D47223313AA1C3700858222 /* CoreGraphics.framework */; };
 		6D47223E13AA1C9700858222 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D47223D13AA1C9700858222 /* QuartzCore.framework */; };
@@ -90,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D62D12C15DA7B3600CE826C /* SystemConfiguration.framework in Frameworks */,
 				5B4E254913F0360300F67F5A /* libmadvertise-ios-sdk.a in Frameworks */,
 				6D47223E13AA1C9700858222 /* QuartzCore.framework in Frameworks */,
 				6D47223413AA1C3700858222 /* CoreGraphics.framework in Frameworks */,
