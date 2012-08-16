@@ -21,9 +21,13 @@
 @synthesize viewController;
 @synthesize window=_window;
 
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    [MadvertiseTracker reportDownload:url];
+    return YES;
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  // [MadvertiseTracker enable];
-  // [MadvertiseTracker reportActionToMadvertise:@"launch"];
+  //[MadvertiseTracker enable];
 
   viewController = [MadvertiseSDKSampleViewController new];
   

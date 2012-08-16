@@ -17,8 +17,9 @@
 
 
 @interface MadvertiseTracker : NSObject {
-	
 }
+
++ (void) reportDownload:(NSURL*) url;
 
 // sends a request on first start to the madvertise server
 // !!call setDebugMode and setProductToken before!!

@@ -60,7 +60,7 @@
 #define MADVERTISE_PARENT_HEIGHT_KEY @"parent_height"
 #define MADVERTISE_PARENT_WIDTH_KEY @"parent_width"
 #define MADVERTISE_MRAID_KEY @"mraid"
-
+#define MADVERTISE_TRACKING_KEY @"tracking_data"
 
 NSString *UserAgentString(void);
 
@@ -75,7 +75,6 @@ NSString *UserAgentString(void);
 + (NSString*) getDeviceOrientation;
 + (NSString*) urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string;
 + (BOOL)      isConnectionAvailable;
-+ (void)      synchronizeWithSafari;
 
 + (void)logWithPath:(char *)path line:(NSUInteger)line string:(NSString *)format, ...;
 

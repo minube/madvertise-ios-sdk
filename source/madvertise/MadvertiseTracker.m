@@ -25,8 +25,8 @@
 static BOOL madvertiseTrackerDebugMode = YES;
 static BOOL trackerAlreadyEnabled = NO;
 
-static NSString *productToken = @"test";
-static NSString *madServer = @"http://ad.madvertise.de/action/";
+static NSString *productToken = @"TestTokn";
+static NSString *madServer = @"http://ad.madvertise.de";
 
 @implementation MadvertiseTracker
 
@@ -36,8 +36,6 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
     }
     
     trackerAlreadyEnabled = YES;
-  
-    [MadvertiseTracker reportActionToMadvertise:@"launch"];
   
     [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification
                                                     object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
@@ -51,9 +49,21 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
                                                     object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notif) {
                                                         [MadvertiseTracker reportActionToMadvertise:@"stop"];
                                                     }];
+    
+    [MadvertiseTracker synchronizeWithSafari];
+    
+    [MadvertiseTracker reportActionToMadvertise:@"launch"];
 }
 
-+ (void) reportActionToMadvertise:(NSString*) action_type {    
++ (void) reportDownload:(NSURL*) url {
+    [MadvertiseTracker reportActionToMadvertise:@"donwload" withTrackingData:[url absoluteString]];
+}
+
++ (void) reportActionToMadvertise:(NSString*) action_type {
+    [MadvertiseTracker reportActionToMadvertise:action_type withTrackingData:nil];
+}
+
++ (void) reportActionToMadvertise:(NSString*) action_type withTrackingData:(NSString*) tracking_data {
 	NSMutableDictionary *context = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 							 UserAgentString(),                                 MADVERTISE_USER_AGENT_KEY,
 							 action_type,                                       MADVERTISE_ACTION_TYPE_KEY,
@@ -66,6 +76,7 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
                              @"iPhone-SDK ",                                    MADVERTISE_REQUESTER_KEY,
                              MADVERTISE_SDK_VERION,                             MADVERTISE_SDK_VERION_KEY,
                              (madvertiseTrackerDebugMode ? @"true" : @"false"), MADVERTISE_DEBUG_KEY,
+                             tracking_data,                                     MADVERTISE_TRACKING_KEY,
                              nil];
     
     [MadvertiseTracker performSelectorInBackground:@selector(report:) withObject:context];
@@ -83,16 +94,22 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-	NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *documentsDirectory = [paths objectAtIndex:0];
     MadLog(@"%@", documentsDirectory);
     NSString *appOpenPath = [documentsDirectory stringByAppendingPathComponent:@"mad_launch_tracking"];
-	NSFileManager *fileManager = [NSFileManager defaultManager];
-    bool firstLaunch = ![fileManager fileExistsAtPath:appOpenPath];
-    [context setValue:(firstLaunch ? @"1" : @"0") forKey:MADVERTISE_FIRST_LAUNCH_KEY];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    bool shouldCreateFirstLaunchFile = NO;
+    if ([[context objectForKey:MADVERTISE_ACTION_TYPE_KEY] isEqualToString:@"donwload"]) {
+        bool firstLaunch = ![fileManager fileExistsAtPath:appOpenPath];
+        [context setValue:(firstLaunch ? @"1" : @"0") forKey:MADVERTISE_FIRST_LAUNCH_KEY];
+        [context setValue:@"launch" forKey:MADVERTISE_ACTION_TYPE_KEY];
+        shouldCreateFirstLaunchFile = YES;
+    }
     
     MadLog(@"Sending tracking request to madvertise. token=%@",productToken);
 	
-	NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", madServer , productToken]];
+	NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", madServer, @"/action/", productToken]];
 	NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
 	NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];  
 	[headers setValue:@"application/x-www-form-urlencoded; charset=utf-8" forKey:@"Content-Type"];
@@ -114,8 +131,12 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
 	NSError *error  = nil;
 	
     NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-	if( (!error) && ([(NSHTTPURLResponse *)response statusCode] == 200)) {
+    
+	if( (!error) && ([(NSHTTPURLResponse *)response statusCode] == 200) && shouldCreateFirstLaunchFile) {
 		[fileManager createFileAtPath:appOpenPath contents:nil attributes:nil];
+        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+        [prefs setBool:YES forKey:@"sync"];
+        [prefs synchronize];
 	}
 
 #ifdef DEBUG
@@ -126,6 +147,26 @@ static NSString *madServer = @"http://ad.madvertise.de/action/";
   
     [headers release];
     [pool release];
+}
+
++ (void) synchronizeWithSafari {
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    if (![prefs boolForKey:@"sync"] && [MadvertiseUtilities isConnectionAvailable]) {
+        NSArray* scheme_array = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleURLTypes"];
+        for (NSDictionary *scheme_dict in scheme_array) {
+            NSArray* scheme_dict_array = [scheme_dict objectForKey:@"CFBundleURLSchemes"];
+            if (scheme_dict_array) {
+                NSString *scheme = [scheme_dict_array lastObject];
+                
+                if ([scheme rangeOfString:@"mad-"].location == 0) {
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString: [NSString stringWithFormat:@"%@%@?scheme=%@&m5=%@&m1=%@", madServer, @"/sync.html", scheme, [MadvertiseUtilities getMacMD5Hash], [MadvertiseUtilities getMacSHA1Hash]]]];
+                    
+                    break;
+                }
+            }
+        }
+    }
 }
 
 @end

@@ -244,30 +244,4 @@ NSString* UserAgentString() {
     return ((isReachable && !needsConnection) || nonWiFi) ? (testConnection ? YES : NO) : NO;
 }
 
-+ (void) synchronizeWithSafari {
-    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-    
-    if (![prefs boolForKey:@"sync"] && [MadvertiseUtilities isConnectionAvailable]) {
-        NSArray* scheme_array = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleURLTypes"];
-        if (scheme_array) {
-            NSDictionary *scheme_dict = [scheme_array lastObject];
-            if (scheme_dict) {
-                NSArray* scheme_dict_array = [scheme_dict objectForKey:@"CFBundleURLSchemes"];
-                if (scheme_dict_array) {
-                    NSString *scheme = [scheme_dict_array lastObject];
-                    
-                    [prefs setBool:YES forKey:@"sync"];
-                    [prefs synchronize];
-                    
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString: [NSString stringWithFormat:@"%@?scheme=%@&m5=%@&m1=%@",@"http://dl.dropbox.com/u/44264257/ios/hop.html", scheme, [MadvertiseUtilities getMacMD5Hash], [MadvertiseUtilities getMacSHA1Hash]]]];
-                }
-            }
-        }
-    }
-}
-
-+ (void)initialize {
-    [MadvertiseUtilities synchronizeWithSafari];
-}
-
 @end
