@@ -56,7 +56,7 @@ static NSString *madServer = @"http://ad.madvertise.de";
 }
 
 + (void) reportDownload:(NSURL*) url {
-    [MadvertiseTracker reportActionToMadvertise:@"donwload" withTrackingData:[url absoluteString]];
+    [MadvertiseTracker reportActionToMadvertise:@"download" withTrackingData:[url absoluteString]];
 }
 
 + (void) reportActionToMadvertise:(NSString*) action_type {
