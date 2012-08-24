@@ -27,7 +27,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  //[MadvertiseTracker enable];
+  //[MadvertiseTracker enableWithToken:@"TestTokn"];
 
   viewController = [MadvertiseSDKSampleViewController new];
   

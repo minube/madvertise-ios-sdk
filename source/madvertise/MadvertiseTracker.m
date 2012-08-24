@@ -24,13 +24,16 @@
 // static variables
 static BOOL madvertiseTrackerDebugMode = YES;
 static BOOL trackerAlreadyEnabled = NO;
-
 static NSString *productToken = @"TestTokn";
 static NSString *madServer = @"http://ad.madvertise.de";
 
 @implementation MadvertiseTracker
 
-+ (void) enable {
++ (void) enableWithToken:(NSString*)token {
+    if (token) {
+        productToken = token;
+    }
+    
     if (trackerAlreadyEnabled) {
         return;
     }
@@ -100,7 +103,7 @@ static NSString *madServer = @"http://ad.madvertise.de";
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
     bool shouldCreateFirstLaunchFile = NO;
-    if ([[context objectForKey:MADVERTISE_ACTION_TYPE_KEY] isEqualToString:@"donwload"]) {
+    if ([[context objectForKey:MADVERTISE_ACTION_TYPE_KEY] isEqualToString:@"download"]) {
         bool firstLaunch = ![fileManager fileExistsAtPath:appOpenPath];
         [context setValue:(firstLaunch ? @"1" : @"0") forKey:MADVERTISE_FIRST_LAUNCH_KEY];
         [context setValue:@"launch" forKey:MADVERTISE_ACTION_TYPE_KEY];

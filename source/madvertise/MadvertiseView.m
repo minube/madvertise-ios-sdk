@@ -175,8 +175,7 @@ int const MadvertiseAdClass_toHeight[] = {
     if ([madDelegate respondsToSelector:@selector(downloadTrackerEnabled)] && [madDelegate respondsToSelector:@selector(appId)]) {
         if ([madDelegate downloadTrackerEnabled] == YES) {
             [MadvertiseTracker setDebugMode: enableDebug];
-            [MadvertiseTracker setProductToken:[madDelegate appId]];
-            [MadvertiseTracker enable];
+            [MadvertiseTracker enableWithToken:[madDelegate appId]];
         }
     }
 

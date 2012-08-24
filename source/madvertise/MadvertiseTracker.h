@@ -20,17 +20,8 @@
 }
 
 + (void) reportDownload:(NSURL*) url;
-
-// sends a request on first start to the madvertise server
-// !!call setDebugMode and setProductToken before!!
 + (void) reportActionToMadvertise: (NSString*) action_type;
-
-// set debug mode, default is NO
 + (void) setDebugMode: (BOOL) debugMode;
-
-// set product token, that you will geth from madvertise
-+ (void) setProductToken: (NSString *) productToken;
-
-+ (void) enable;
++ (void) enableWithToken:(NSString*)token;
 
 @end

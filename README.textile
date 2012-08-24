@@ -4,7 +4,8 @@ h2. Intro
 
 The madvertise iOS SDK lets you monetize your iOS apps via advertising. Basically, the code sends http requests to the madvertise ad server and displays banner and rich media ads in various formats.
 
-It supports different banner sizes (mma, medium_rectangle, portrait, landscape, fullscreen, leaderboard), ad rotation, in-app landing pages, animated roll-over effects, etc. ...
+It supports different banner sizes (mma, medium_rectangle, portrait, landscape, fullscreen, leaderboard), ad rotation, in-app landing pages, animated roll-over effects, etc.
+
 
 h2. License
 
@@ -12,11 +13,12 @@ The iOS SDK is using JSONKit, a library for parsing JSON data (https://github.co
 
 All other code is published under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
 
+
 h2. Preparations
 
 * Install Xcode
 
-* Install Git
+* Install Git (which is part of the Apple Command Line Tools)
 
 * Clone this repository:
 
@@ -27,6 +29,7 @@ h2. Preparations
   * UIKit.framework
   * CoreGraphics.framework
   * QuartzCore.framework
+  * SystemConfiguration.framework
 
 * Sign up at [madvertise](https://app.madvertise.de/register)
   * If you don't have already an account, please sign up.
@@ -35,9 +38,10 @@ h2. Preparations
 
 h2. Sample App
 
-The SDK comes with a very simple example, how to integrate the SDK in your APP. You can find it at [PROJECT_ROOT]/sample/AnotherSDKTest/. Please make sure to add the required frameworks / libraries and change the build settings accordingly to your development environment.
+The SDK comes with a very simple example, how to integrate the SDK in your APP. You can find it at [PROJECT_ROOT]/example/. Please make sure to add the required frameworks / libraries and change the build settings accordingly to your development environment.
 
-h2. Using the SDK
+
+h2. Using the SDK to show ads
 
 * Include the SDK project located at [PROJECT_ROOT]/source/ via "[right-click on root project]/Add/Existing Files ..."
 
@@ -48,6 +52,36 @@ h2. Using the SDK
 * Make sure the appId method of your delegate returns the token, that you get when creating an app on our [plattform](https://app.madvertise.de/register).
 
 The [original documentation](http://redmine.madvertise.me/projects/madapi/wiki/IphoneSdk) contains some further information on how to use the SDK.
+
+h2. Using the SDK to track download conversions
+
+The madvertise iOS SDK allows advertisers to create a powerful link between ads running on the madvertise network and their own apps. The integration in your app is done by the following steps:
+
+* Include the SDK project located at [PROJECT_ROOT]/source/ via "[right-click on root project]/Add/Existing Files ..."
+
+* Add the required frameworks / libraries and change the build settings accordingly to your development environment.
+
+* Open your App Delegate implementation file and find or create the following methods
+
+** "- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions" and add the following code line: "[MadvertiseTracker enableWithToken:@"TestTokn"];" (please replace TestTokn with your product-Token provided by madvertise)
+
+** "- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation" and add the code line "[MadvertiseTracker reportDownload:url];"
+
+* Add a scheme to your app:
+
+** Select your project on the left side of the Xcode window
+
+** Select your Target and select "Info"
+
+** Open the "URL Types" area and click the + button on the bottom of this area
+
+** Enter "mad-TestTokn" into the "URL Scheme" field (please replace TestTokn with your product-Token)
+
+
+h2 FAQ
+
+todo
+
 
 h2. About
 
@@ -64,6 +98,7 @@ v5.1.0
 
 * enhanced preloader support
 * a lot of bugfixes
+* enhanced download conversion tracking
 
 v5.0.0
 
