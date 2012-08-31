@@ -115,7 +115,8 @@ ad2 = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
 As seen above, you can change the Ad Reloading Time via changing secondsToRefresh.
 
 Please note that you can pass us additional parameters such as Age, Gender and Location oft the user – please pass us those via MadvertiseSDKSampleDelegate . Possible parameters are
-    
+
+-   (BOOL) downloadTrackerEnabled : return YES to enable download-tracking with your appId
 -   (BOOL) debugEnabled : return YES to enable debug-mode
 -   (CLLocationCoordinate2D) location : should return the location of the user
 -   (NSString*) age : should return the age of the user
