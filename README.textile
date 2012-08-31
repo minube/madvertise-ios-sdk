@@ -91,7 +91,7 @@ The first case should be clear, the second means that you get an ad which bears 
 
 If you want to disable MRaid compatible ads, thus only loading regular, classic banners please pass us mRaidDisabled = 1 .
 
-h2. Parameters you can pass to us
+h3. Parameters you can pass to us
 
 The Banner Types you can request are as follows :
 
