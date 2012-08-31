@@ -23,9 +23,9 @@
   return @"TestTokn";
 }
 
-//- (BOOL) downloadTrackerEnabled {
-//    return YES;
-//}
+- (BOOL) downloadTrackerEnabled {
+  return YES;
+}
 
 //- (double) durationOfBannerAnimation {
 //    return 0.5;
