@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #define MadLog(format, ...)
 #endif
 
-#define MADVERTISE_SDK_VERION @"5.0.4"
+#define MADVERTISE_SDK_VERION @"5.1"
 
 #define MADVERTISE_USER_AGENT_KEY @"ua"
 #define MADVERTISE_APP_KEY @"app"
@@ -60,7 +60,7 @@
 #define MADVERTISE_PARENT_HEIGHT_KEY @"parent_height"
 #define MADVERTISE_PARENT_WIDTH_KEY @"parent_width"
 #define MADVERTISE_MRAID_KEY @"mraid"
-
+#define MADVERTISE_TRACKING_KEY @"tracking_data"
 
 NSString *UserAgentString(void);
 
@@ -71,8 +71,10 @@ NSString *UserAgentString(void);
 + (NSString*) getTimestamp;
 + (NSString*) getAppName;
 + (NSString*) getAppVersion;
-+ (CGSize) getScreenResolution;
++ (CGSize)    getScreenResolution;
 + (NSString*) getDeviceOrientation;
++ (NSString*) urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string;
++ (BOOL)      isConnectionAvailable;
 
 + (void)logWithPath:(char *)path line:(NSUInteger)line string:(NSString *)format, ...;
 

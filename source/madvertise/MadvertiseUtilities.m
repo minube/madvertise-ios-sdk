@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #import <Foundation/NSData.h>
 #import "MadvertiseUtilities.h"
+#import "SystemConfiguration/SystemConfiguration.h"
 
 NSString* UserAgentString() {
 	static NSString *userAgent = nil;
@@ -27,7 +28,6 @@ NSString* UserAgentString() {
 }
 
 @implementation MadvertiseUtilities
-
 
 + (NSString *) getIP {
 	NSString *result = nil;
@@ -57,7 +57,6 @@ NSString* UserAgentString() {
 					result = [ip copy];
 				}
 				if(![interface isEqualToString:@"lo0"] && ![interface isEqualToString:@"en0"] && ![interface isEqualToString:@"fw0"] && ![interface isEqualToString:@"en1"] ) {
-					// NSLog(@"Interface %@", interface);
 					result = [ip copy];
 				}
         [ip release];
@@ -204,6 +203,45 @@ NSString* UserAgentString() {
     } else {
         return @"portrait";
     }
+}
+
++ (NSString *)urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string {
+	return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                (CFStringRef)string,
+                                                                NULL,
+                                                                (CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ",
+                                                                CFStringConvertNSStringEncodingToEncoding(encoding)) autorelease];
+}
+
++ (BOOL) isConnectionAvailable {
+    // Create zero addy
+    struct sockaddr_in zeroAddress;
+    bzero(&zeroAddress, sizeof(zeroAddress));
+    zeroAddress.sin_len = sizeof(zeroAddress);
+    zeroAddress.sin_family = AF_INET;
+    
+    // Recover reachability flags
+    SCNetworkReachabilityRef defaultRouteReachability = SCNetworkReachabilityCreateWithAddress(NULL, (struct sockaddr *)&zeroAddress);
+    SCNetworkReachabilityFlags flags;
+    
+    BOOL didRetrieveFlags = SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags);
+    CFRelease(defaultRouteReachability);
+    
+    if (!didRetrieveFlags)
+    {
+        NSLog(@"Error. Could not recover network reachability flags");
+        return NO;
+    }
+    
+    BOOL isReachable = flags & kSCNetworkFlagsReachable;
+    BOOL needsConnection = flags & kSCNetworkFlagsConnectionRequired;
+    BOOL nonWiFi = flags & kSCNetworkReachabilityFlagsTransientConnection;
+    
+    NSURL *testURL = [NSURL URLWithString:@"http://ad.madvertise.de/"];
+    NSURLRequest *testRequest = [NSURLRequest requestWithURL:testURL  cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:2.0];
+    NSURLConnection *testConnection = [[[NSURLConnection alloc] initWithRequest:testRequest delegate:self] autorelease];
+    
+    return ((isReachable && !needsConnection) || nonWiFi) ? (testConnection ? YES : NO) : NO;
 }
 
 @end

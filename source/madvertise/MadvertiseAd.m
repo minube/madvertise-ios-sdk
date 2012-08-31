@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 #import "MadvertiseAd.h"
 #import "MadvertiseUtilities.h"
 
-
 @implementation MadvertiseAd
 
 @synthesize bannerType;
@@ -24,11 +23,11 @@
 @synthesize bannerUrl;
 @synthesize clickUrl;
 @synthesize text;
+@synthesize markup;
 @synthesize hasBanner;
 @synthesize isRichMedia;
 @synthesize width;
 @synthesize height;
-@synthesize shouldOpenInAppBrowser;
 @synthesize trackingArray;
 
 - (MadvertiseAd*)initFromDictionary:(NSDictionary*)dictionary {
@@ -36,10 +35,11 @@
   if ((self = [super init])) {
       MadLog(@"%@", dictionary);
 
-      clickUrl                = [[dictionary objectForKey:@"click_url"] retain];
-      text                    = [([dictionary objectForKey:@"text"] ?: @"") retain];
-      hasBanner               = [[dictionary objectForKey:@"has_banner"] boolValue];
-      shouldOpenInAppBrowser  = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
+      clickUrl  = [[dictionary objectForKey:@"click_url"] retain];
+      text      = [([dictionary objectForKey:@"text"] ?: @"") retain];
+      hasBanner = [[dictionary objectForKey:@"has_banner"] boolValue];
+      markup    = [([dictionary objectForKey:@"markup"] ?: @"") retain];
+      shouldOpenInAppBrowser = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
       
       trackingArray = [dictionary objectForKey:@"tracking"];
       [trackingArray retain];
@@ -72,67 +72,133 @@
               isRichMedia = NO;
           }
       }
-  }
-  return self;
+    }
+
+    return self;
+}
+
+- (NSString*) to_html {
+    // ad markup generated server-side
+    if (self.markup && self.markup.length > 0) {
+        return self.markup;
+    }
+
+    // rich-media ad
+    if (self.isRichMedia) {
+        if (isMraid) {
+            return [self mraidToHtml];
+        }
+        else {
+            return [self richmediaToHtml];
+        }
+    }
+
+    // textad
+    if (!self.hasBanner) {
+        return [self textAdToHtml];
+    }
+
+    // ad with banner
+    NSString* template = @""
+    "<html>"
+    "<head>"
+    "<style type=\"text/css\"> body {margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; background-color:black; text-align:center; border:none}</style>"
+    "</head>"
+    "<body>"
+    "<script type='text/javascript' src='mraid.js'></script>"
+    "%@"
+    "</body>"
+    "</html>";
+    
+    NSString* body = @"";
+
+    if (self.bannerUrl) {
+        if (shouldOpenInAppBrowser) {
+            body = [NSString stringWithFormat:@"<img src=\"%@\" onclick=\"mraid.open(\'%@\')\"></img>%@", self.bannerUrl, self.clickUrl, [self trackingHtml]];
+        } else {
+            body = [NSString stringWithFormat:@"<a href=\"%@\"><img src=\"%@\"></img></a>%@", self.clickUrl, self.bannerUrl, [self trackingHtml]];
+        }
+    }
+
+    return [NSString stringWithFormat:template, body];
+}
+
+- (Boolean)isValid {
+    if (!self.markup && !bannerUrl && !self.text && !self.isRichMedia) {
+        return false;
+    }
+
+    return true;
+}
+
+- (Boolean)isLoadableViaUrl {
+    return (self.isRichMedia && self.richmediaUrl && isMraid);
+}
+
+- (NSURL*)url {
+    return [NSURL URLWithString:self.richmediaUrl];
 }
 
 - (NSString*)trackingHtml {
     if (!trackingArray) {
         return @"";
     }
-    
+
     NSString* template = @"<img src='%@' width='1' height='1' alt=''>";
-    
+
     NSString* result = @"";
     for (NSString* trackingUrl in trackingArray) {
         result = [result stringByAppendingString:[NSString stringWithFormat:template, trackingUrl]];
     }
-    
+
     return result;
 }
 
 - (NSString*)textAdToHtml {
-  NSString* template = @""
-  "<html>"
-  "<head>"
-  "<style type=\"text/css\">"
-  "body {"
-  "width:320px;"
-  "height:53px;"
-  "  margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; text-align:center; border:none;"
-  "overflow: hidden;"
-  "}"
-  "div {"
-  "background: -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,0.75)), to(rgba(0,0,0,1)));"
-  "width:321px;"
-  "height:53px;"
-  "  margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; text-align:center; border:none;"
-  "color: #FFF;"
-  "  font-family: helvetica;"
-  "  font-size: %dpx;"
-  "}"
-  "p {"
-  "padding:10px;"
-  "}"
-  "div.madvertise {"
-  "  font-size: 9px;"
-  "position: absolute;"
-  "top: 40px;"
-  "left: 120px;"
-  "background: none;"
-  "}"
-  "</style>"
-  "</head>"
-  "<body>"
-  "<div><p>%@</p><div class='madvertise'>ad by madvertise</div></div>"
-  "%@"
-  "</body>"
-  "</html>";
-  int size = 28;
-  if(self.text.length > 30) {
-    size -= (self.text.length - 30) * 1.5;
-  }
-  return [NSString stringWithFormat:template, size < 12 ? 12 : size, self.text, [self trackingHtml]];
+    NSString* template = @""
+    "<html>"
+    "<head>"
+    "<style type=\"text/css\">"
+    "body {"
+    "width:320px;"
+    "height:53px;"
+    "  margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; text-align:center; border:none;"
+    "overflow: hidden;"
+    "}"
+    "div {"
+    "background: -webkit-gradient(linear, left top, left bottom, from(rgba(0,0,0,0.75)), to(rgba(0,0,0,1)));"
+    "width:321px;"
+    "height:53px;"
+    "  margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; text-align:center; border:none;"
+    "color: #FFF;"
+    "  font-family: helvetica;"
+    "  font-size: %dpx;"
+    "}"
+    "p {"
+    "padding:10px;"
+    "}"
+    "div.madvertise {"
+    "  font-size: 9px;"
+    "position: absolute;"
+    "top: 40px;"
+    "left: 120px;"
+    "background: none;"
+    "}"
+    "</style>"
+    "</head>"
+    "<body>"
+    "<script type='text/javascript' src='mraid.js'></script>"
+    "<div onclick=\"mraid.open(\'%@\')\"><p>%@</p><div class='madvertise'>ad by madvertise</div></div>"
+    "%@"
+    "</body>"
+    "</html>";
+
+    int size = 28;
+    if (self.text.length > 30) {
+        size -= (self.text.length - 30) * 1.5;
+    }
+
+    return [NSString stringWithFormat:template, size < 12 ? 12 : size, self.clickUrl, self.text, [self trackingHtml]];
 }
 
 - (NSString*) richmediaToHtml {
@@ -179,53 +245,12 @@
     "<iframe id='main' src='%@' allowtransparency='true' width='320' height='480' seamless scrolling='no' style='z-index:10000; background:none;position: fixed;top: 0px;float:left;overflow: hidden !important;border: none !important;background-color: none !important;' />"
     "</body>"
     "</html>";
-    
+
     return [NSString stringWithFormat:template, self.richmediaUrl];
 }
 
 - (NSString*) mraidToHtml {
     return [NSString stringWithFormat:@"<script type='text/javascript' src='%@'></script>", self.bannerUrl];
-}
-
-- (NSString*) to_html {
-    if (self.isRichMedia) {
-        if (isMraid) {
-            return [self mraidToHtml];
-        }
-        else {
-            return [self richmediaToHtml];
-        }
-    }
-    
-    if (!self.hasBanner) {
-        return [self textAdToHtml];
-    }
-  
-    NSString* template = @""
-        "<html>"
-        "<head>"
-        "<style type=\"text/css\"> body {margin-left:0px; margin-right:0px; margin-top:0px; margin-bottom:0px; padding:0px; background-color:black; text-align:center; border:none}</style>"
-        "</head>"
-        "<body>"
-        "%@"
-        "</body>"
-        "</html>";
-
-    NSString* body = @"";
-
-    if (self.bannerUrl) {
-        body = [NSString stringWithFormat:@"<img src=\"%@\"></img>%@", self.bannerUrl, [self trackingHtml]];
-    }
-    
-    return [NSString stringWithFormat:template, body];
-}
-
-- (Boolean)isLoadableViaUrl {    
-    return (self.isRichMedia && self.richmediaUrl && isMraid);
-}
-
-- (NSURL*)url {
-    return [NSURL URLWithString:self.richmediaUrl];
 }
 
 - (void)dealloc {

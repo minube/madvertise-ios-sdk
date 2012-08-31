@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D059B2714F7F88200BB8173 /* NSString+URLEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D059B2514F7F88100BB8173 /* NSString+URLEncoding.h */; };
-		4D059B2814F7F88200BB8173 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D059B2614F7F88100BB8173 /* NSString+URLEncoding.m */; };
 		4D059B5014FE674700BB8173 /* MPAdBrowserController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D059B4414FE674700BB8173 /* MPAdBrowserController.h */; };
 		4D059B5114FE674700BB8173 /* MPAdBrowserController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D059B4514FE674700BB8173 /* MPAdBrowserController.m */; };
 		4D059B5214FE674700BB8173 /* MPConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D059B4914FE674700BB8173 /* MPConstants.h */; };
@@ -34,8 +32,9 @@
 		4D0A078714F5357E00852970 /* UIWebView+MPAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0A078314F5357E00852970 /* UIWebView+MPAdditions.h */; };
 		4D0A078814F5357E00852970 /* UIWebView+MPAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0A078414F5357E00852970 /* UIWebView+MPAdditions.m */; };
 		4D3A1887151B966200E0D347 /* MPAdBrowserController.xib in Headers */ = {isa = PBXBuildFile; fileRef = 4D059B4614FE674700BB8173 /* MPAdBrowserController.xib */; };
-		4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */; };
-		4D8BE2E014D6E04A00212FD0 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */; };
+		4D5944FF15B051AC00105993 /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D5944FD15B051AC00105993 /* JSONKit.h */; };
+		4D59450015B051AC00105993 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5944FE15B051AC00105993 /* JSONKit.m */; };
+		4D62D12A15DA7B2800CE826C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D62D12915DA7B2800CE826C /* SystemConfiguration.framework */; };
 		5B4E248813F0323700F67F5A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B0A658013EFEA7B0032A2DD /* Foundation.framework */; };
 		5B63957013F40F4E003D95AF /* MadvertiseAd.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B63956C13F40F4E003D95AF /* MadvertiseAd.h */; };
 		5B63957213F40F4E003D95AF /* MadvertiseTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B63956E13F40F4E003D95AF /* MadvertiseTracker.h */; };
@@ -48,8 +47,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4D059B2514F7F88100BB8173 /* NSString+URLEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+URLEncoding.h"; sourceTree = "<group>"; };
-		4D059B2614F7F88100BB8173 /* NSString+URLEncoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+URLEncoding.m"; sourceTree = "<group>"; };
 		4D059B4414FE674700BB8173 /* MPAdBrowserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPAdBrowserController.h; sourceTree = "<group>"; };
 		4D059B4514FE674700BB8173 /* MPAdBrowserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPAdBrowserController.m; sourceTree = "<group>"; };
 		4D059B4614FE674700BB8173 /* MPAdBrowserController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MPAdBrowserController.xib; sourceTree = "<group>"; };
@@ -78,8 +75,9 @@
 		4D0A076B14F5342000852970 /* MRProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRProperty.m; sourceTree = "<group>"; };
 		4D0A078314F5357E00852970 /* UIWebView+MPAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWebView+MPAdditions.h"; sourceTree = "<group>"; };
 		4D0A078414F5357E00852970 /* UIWebView+MPAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+MPAdditions.m"; sourceTree = "<group>"; };
-		4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = SOURCE_ROOT; };
-		4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = SOURCE_ROOT; };
+		4D5944FD15B051AC00105993 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = SOURCE_ROOT; };
+		4D5944FE15B051AC00105993 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = SOURCE_ROOT; };
+		4D62D12915DA7B2800CE826C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		4DB4087C14FE6BB900E44C4E /* MRAID.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = MRAID.bundle; sourceTree = "<group>"; };
 		5B0A658013EFEA7B0032A2DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5B0A65C913F00B660032A2DD /* MadvertiseDelegationProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MadvertiseDelegationProtocol.h; sourceTree = "<group>"; };
@@ -99,6 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D62D12A15DA7B2800CE826C /* SystemConfiguration.framework in Frameworks */,
 				5B4E248813F0323700F67F5A /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -152,8 +151,8 @@
 		4D8BE2DC14D6E02B00212FD0 /* JSONKit */ = {
 			isa = PBXGroup;
 			children = (
-				4D8BE2DD14D6E04A00212FD0 /* JSONKit.h */,
-				4D8BE2DE14D6E04A00212FD0 /* JSONKit.m */,
+				4D5944FD15B051AC00105993 /* JSONKit.h */,
+				4D5944FE15B051AC00105993 /* JSONKit.m */,
 			);
 			name = JSONKit;
 			sourceTree = "<group>";
@@ -161,6 +160,7 @@
 		5B0A657213EFEA7B0032A2DD = {
 			isa = PBXGroup;
 			children = (
+				4D62D12915DA7B2800CE826C /* SystemConfiguration.framework */,
 				5B0A658213EFEA7B0032A2DD /* madvertise-ios-sdk */,
 				5B0A657F13EFEA7B0032A2DD /* Frameworks */,
 				5B0A657E13EFEA7B0032A2DD /* Products */,
@@ -206,8 +206,6 @@
 				5B63956E13F40F4E003D95AF /* MadvertiseTracker.h */,
 				5B63956F13F40F4E003D95AF /* MadvertiseTracker.m */,
 				5B0A65C913F00B660032A2DD /* MadvertiseDelegationProtocol.h */,
-				4D059B2514F7F88100BB8173 /* NSString+URLEncoding.h */,
-				4D059B2614F7F88100BB8173 /* NSString+URLEncoding.m */,
 			);
 			path = madvertise;
 			sourceTree = SOURCE_ROOT;
@@ -223,7 +221,6 @@
 				5B63957213F40F4E003D95AF /* MadvertiseTracker.h in Headers */,
 				5B63957613F40F58003D95AF /* MadvertiseUtilities.h in Headers */,
 				5B6395A813F411F4003D95AF /* MadvertiseView.h in Headers */,
-				4D8BE2DF14D6E04A00212FD0 /* JSONKit.h in Headers */,
 				4D0A076D14F5342000852970 /* MRAdView+Controllers.h in Headers */,
 				4D0A076E14F5342000852970 /* MRAdView.h in Headers */,
 				4D3A1887151B966200E0D347 /* MPAdBrowserController.xib in Headers */,
@@ -233,12 +230,12 @@
 				4D0A077614F5342000852970 /* MRDimmingView.h in Headers */,
 				4D0A077814F5342000852970 /* MRProperty.h in Headers */,
 				4D0A078714F5357E00852970 /* UIWebView+MPAdditions.h in Headers */,
-				4D059B2714F7F88200BB8173 /* NSString+URLEncoding.h in Headers */,
 				4D059B5014FE674700BB8173 /* MPAdBrowserController.h in Headers */,
 				4D059B5214FE674700BB8173 /* MPConstants.h in Headers */,
 				4D059B5314FE674700BB8173 /* MPGlobal.h in Headers */,
 				4D059B5514FE674800BB8173 /* MPLogging.h in Headers */,
 				4D059B5714FE674800BB8173 /* MPTimer.h in Headers */,
+				4D5944FF15B051AC00105993 /* JSONKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +294,6 @@
 				5B6395B113F41205003D95AF /* MadvertiseUtilities.m in Sources */,
 				5B6395B313F41205003D95AF /* MadvertiseAd.m in Sources */,
 				5B6395B513F41205003D95AF /* MadvertiseTracker.m in Sources */,
-				4D8BE2E014D6E04A00212FD0 /* JSONKit.m in Sources */,
 				4D0A076F14F5342000852970 /* MRAdView.m in Sources */,
 				4D0A077114F5342000852970 /* MRAdViewBrowsingController.m in Sources */,
 				4D0A077314F5342000852970 /* MRAdViewDisplayController.m in Sources */,
@@ -305,11 +301,11 @@
 				4D0A077714F5342000852970 /* MRDimmingView.m in Sources */,
 				4D0A077914F5342000852970 /* MRProperty.m in Sources */,
 				4D0A078814F5357E00852970 /* UIWebView+MPAdditions.m in Sources */,
-				4D059B2814F7F88200BB8173 /* NSString+URLEncoding.m in Sources */,
 				4D059B5114FE674700BB8173 /* MPAdBrowserController.m in Sources */,
 				4D059B5414FE674800BB8173 /* MPGlobal.m in Sources */,
 				4D059B5614FE674800BB8173 /* MPLogging.m in Sources */,
 				4D059B5814FE674800BB8173 /* MPTimer.m in Sources */,
+				4D59450015B051AC00105993 /* JSONKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +361,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -382,6 +379,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",

@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #import "MadvertiseView.h"
 
 @interface MadvertiseSDKSampleViewController : UIViewController {
+    MadvertiseSDKSampleDelegate *madDelegate;
+    MadvertiseView *ad;
 }
 
 @end

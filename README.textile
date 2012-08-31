@@ -1,10 +1,11 @@
-h1. madvertise iOS SDK (Version 5.0.4)
+h1. madvertise iOS SDK (Version 5.1.0)
 
 h2. Intro
 
 The madvertise iOS SDK lets you monetize your iOS apps via advertising. Basically, the code sends http requests to the madvertise ad server and displays banner and rich media ads in various formats.
 
-It supports different banner sizes (mma, medium_rectangle, portrait, landscape, fullscreen, leaderboard), ad rotation, in-app landing pages, animated roll-over effects, etc. ...
+It supports different banner sizes (mma, medium_rectangle, portrait, landscape, fullscreen, leaderboard), ad rotation, in-app landing pages, animated roll-over effects, etc.
+
 
 h2. License
 
@@ -12,43 +13,131 @@ The iOS SDK is using JSONKit, a library for parsing JSON data (https://github.co
 
 All other code is published under the Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
 
+
 h2. Preparations
 
 * Install Xcode
-
-* Install Git
-
-* Clone this repository:
-
-    git clone git@github.com:madvertise/madvertise-ios-sdk.git
-
+* Install Git (which is part of the Apple Command Line Tools)
+* Clone this repository: git clone git@github.com:madvertise/madvertise-ios-sdk.git
 * Always include the following 4 libraries from Apple in you projects:
-  * Foundation.framework
-  * UIKit.framework
-  * CoreGraphics.framework
-  * QuartzCore.framework
-  * Security.framework
-
-* Sign up at [madvertise](https://app.madvertise.de/register)
-  * If you don't have already an account, please sign up.
-  * Create an app and copy the token, it will identify the requests send to our ad-server.
-  * The Sample SDK comes with its own token. You can use it during development and for testing.
+  - Foundation.framework
+  - UIKit.framework
+  - CoreGraphics.framework
+  - QuartzCore.framework
+  - SystemConfiguration.framework
+* Sign up at "madvertise":https://app.madvertise.de/register
+  - If you don't have already an account, please sign up.
+  - Create an app and copy the token, it will identify the requests send to our ad-server.
+  - The Sample SDK comes with its own token. You can use it during development and for testing.
 
 h2. Sample App
 
-The SDK comes with a very simple example, how to integrate the SDK in your APP. You can find it at [PROJECT_ROOT]/sample/AnotherSDKTest/. Please make sure to add the required frameworks / libraries and change the build settings accordingly to your development environment.
+The SDK comes with a very simple example, how to integrate the SDK in your APP. You can find it at [PROJECT_ROOT]/example/. Please make sure to add the required frameworks / libraries and change the build settings accordingly to your development environment.
 
-h2. Using the SDK
+
+h2. Using the SDK to show ads
 
 * Include the SDK project located at [PROJECT_ROOT]/source/ via "[right-click on root project]/Add/Existing Files ..."
-
 * Add the required frameworks / libraries and change the build settings accordingly to your development environment.
-
 * Embed the MadvertiseView as shown in the sample app.
+* Make sure the appId method of your delegate returns the token, that you get when creating an app on our "platform":https://app.madvertise.de/register.
 
-* Make sure the appId method of your delegate returns the token, that you get when creating an app on our [plattform](https://app.madvertise.de/register).
+h3.    Embedding the banner type Rich Media 
 
-The [original documentation](http://redmine.madvertise.me/projects/madapi/wiki/IphoneSdk) contains some further information on how to use the SDK.
+Please consider the differences in behaviour and embedding of those ads to guarantee a seamlessly working user experience!
+
+Make sure you treat RM in a separate View. If you plan on requesting Rich Media, please do this from a separated, second view rather than using the same view for ordinary banners and Rich Media banners. This helps to avoid ugly transitions or more severe problems. 
+
+Sample Code for requesting Rich Media (in overlay, view "ad") and standard mma (shifted to the lower corner of iPhone / iPad, "ad2") simultaneously is as follows (MadvertiseSDKSampleViewController.m in the madvertise Sample app): 
+
+bc. MadvertiseView *ad = nil;
+MadvertiseView *ad2 = nil;
+if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    //iPad: Load RichMedia in Overlay (ad2) , load Portrait (ad)
+    ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClasPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+    ad2 = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
+    [ad place_at_x:20 y:914];
+    [self.view addSubview:ad];
+    [self.view bringSubviewToFront:ad];
+    [self.view addSubview:ad2];
+    [self.view bringSubviewToFront:ad2];
+} else {
+    //iPhone: Load RichMedia in Overlay (ad2) , load MMA (ad)        
+    ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+    ad2 = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
+    [ad place_at_x:0 y:407];
+    [self.view addSubview:ad];
+    [self.view bringSubviewToFront:ad];
+    [self.view addSubview:ad2];
+    [self.view bringSubviewToFront:ad2];
+}
+
+* Please don't shift or move the Rich Media container. This helps preventing unintended ad behaviour / blocking of the app. Generally Rich Media should be able to take the whole screen of your app (though it doesn't necessarily do so) like an interstitial.  
+* Sticking to the common integration process is a good idea. This means using the latest version of our SDK as well as using the TestTokn first. If your app shows working Rich Media ads using the test token, this means that from a technical point of view ad delivery is working. 
+Real ads should not pose a problem for your ad then, though at first they may not show. The reason for this: When switching to your live token, it can take a time until your app is ready to get Rich Media ads, we kindly ask you to be patient here (campaigns may be running out at the moment / your app maybe isn't categorized already)  Please don't hesitate to contact our support team (support@madvertise.com) in case of further questions - other than that, happy integrating! 
+
+h3.    The MRaid standard and Rich Media
+
+The fact that developers can request both the banner type Rich Media and pass the option mraid = true for „normal“ banner types may be confusing. 
+
+Rich Media: Please bear in mind that _Rich Media_ first and foremost is a _special banner type_. It gets loaded in an overlay over your content, whereas normal banners have their fixed space allocated. Thus, banner type Rich Media makes a close button mandatory, normal bannertypes don’t.
+
+_MRaid_ on the other hand is a _technical standard_ which makes it possible to deliver more complex ads. Since newer version of  our SDKs are MRaid-compatible. What does this mean? When you ask for a regular banner type (MMA, Portrait etc.) our server will deliver either a 
+
+* normal banner in the requested format, or an
+* MRaid-compatible ad which has the requested banner size as inital state.
+
+The first case should be clear, the second means that you get an ad which bears some MRaid-functionality (expanding,transitions, animations), which has an initial size exactly like the banner type you requested. As this initial banner doesn’t feature a close button, please make absolutely sure you don’t load it as interstitial / overlay, or it may block content.
+
+If you want to disable MRaid compatible ads, thus only loading regular, classic banners please pass us mRaidDisabled = 1 .
+
+h3. Parameters you can pass to us
+
+The Banner Types you can request are as follows :
+
+* MadvertiseAdClassMMA : 320x53 pixels
+* MadvertiseAdClassMediumRectangle : 300x250 pixels
+* MadvertiseAdClassLeaderboard : 728x90 pixels
+* MadvertiseAdClassPortrait : 766x66 pixels
+* MadvertiseAdClassLandscape : 1024x66 pixels
+* MadvertiseAdClassFullscreen : 768x768 pixels
+
+Request those types in your app via e.g.
+
+ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
+
+The banner types above should be loaded inline with your content, into a space fitting their size.
+
+Additionally, you can request the banner type Rich Media, which isn’t loaded inline, but into an overlay. Request this banner type using
+
+ad2 = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate];
+
+As seen above, you can change the Ad Reloading Time via changing secondsToRefresh.
+
+Please note that you can pass us additional parameters such as Age, Gender and Location oft the user – please pass us those via MadvertiseSDKSampleDelegate . Possible parameters are
+
+-   (BOOL) downloadTrackerEnabled : return YES to enable download-tracking with your appId
+-   (BOOL) debugEnabled : return YES to enable debug-mode
+-   (CLLocationCoordinate2D) location : should return the location of the user
+-   (NSString*) age : should return the age of the user
+-   (NSString *) gender : should return the gender of the user
+-   (BOOL) mRaidDisabled : return YES to disable MRaid ads
+
+
+h2. Using the SDK to track download conversions
+
+The madvertise iOS SDK allows advertisers to create a powerful link between ads running on the madvertise network and their own apps. The integration in your app is done by the following steps:
+
+* Include the SDK project located at [PROJECT_ROOT]/source/ via "[right-click on root project]/Add/Existing Files ..."
+* Add the required frameworks / libraries and change the build settings accordingly to your development environment.
+* Open your App Delegate implementation file and find or create the following methods
+** "- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions" and add the following code line: "[MadvertiseTracker enableWithToken:@"TestTokn"];" (please replace TestTokn with your product-Token provided by madvertise)
+** "- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation" and add the code line "[MadvertiseTracker reportDownload:url];"
+* Add a scheme to your app:
+** Select your project on the left side of the Xcode window
+** Select your Target and select "Info"
+** Open the "URL Types" area and click the + button on the bottom of this area
+** Enter "mad-TestTokn" into the "URL Scheme" field (please replace TestTokn with your product-Token)
 
 h2. About
 
@@ -60,6 +149,12 @@ This is why madvertise decided to make all SDKs public as open source projects. 
 
 
 h2. Change log
+
+v5.1.0
+
+* enhanced preloader support
+* a lot of bugfixes
+* enhanced download conversion tracking
 
 v5.0.0
 

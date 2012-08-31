@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 #import <CoreLocation/CoreLocation.h>
 
 typedef enum tagMadvertiseAnimationClass {
-  MadvertiseAnimationClassLeftToRight,
-  MadvertiseAnimationClassTopToBottom,
-  MadvertiseAnimationClassCurlDown,
-  MadvertiseAnimationClassFade,
-  MadvertiseAnimationClassNone 
+    MadvertiseAnimationClassLeftToRight,
+    MadvertiseAnimationClassTopToBottom,
+    MadvertiseAnimationClassCurlDown,
+    MadvertiseAnimationClassFade,
+    MadvertiseAnimationClassNone
 } MadvertiseAnimationClass;
 
 @class MadvertiseView;
@@ -31,11 +31,10 @@ typedef enum tagMadvertiseAnimationClass {
 @required
 - (NSString *) appId;
 
-
 @optional
 
 - (double) durationOfBannerAnimation;               // 1.5 for example
-- (MadvertiseAnimationClass) bannerAnimationTyp;    // curlDown, topToBottom, leftToRight, fade, none
+- (MadvertiseAnimationClass) bannerAnimationType;   // curlDown, topToBottom, leftToRight, fade, none
 - (void) inAppBrowserWillOpen;                      // YES | NO
 - (void) inAppBrowserClosed;                        // YES | NO
 - (BOOL) debugEnabled;                              // YES | NO
@@ -45,4 +44,5 @@ typedef enum tagMadvertiseAnimationClass {
 - (CLLocationCoordinate2D) location;
 - (NSString *) gender;                              // F | M 
 - (NSString *) age;                                 // single number 1,2,.. || range 0-120
+
 @end

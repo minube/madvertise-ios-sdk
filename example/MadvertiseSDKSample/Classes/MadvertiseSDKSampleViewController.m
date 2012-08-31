@@ -1,4 +1,4 @@
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 @implementation MadvertiseSDKSampleViewController
 
 - (void)viewDidLoad {
-  [super viewDidLoad];
-  
-//    Create a new MadvertiseSDKSampleDelegate.
+    [super viewDidLoad];
+
+//    1. Create a new MadvertiseSDKSampleDelegate.
 //    
 //    Some possible delegate methods:
 //                               - (NSString *) appId : should return your SiteToken
@@ -32,48 +32,54 @@
 //                               - (NSString*) age : should return the age of the user
 //                               - (NSString *) gender : should return the gender of the user
 //                               - (BOOL) mRaidDisabled : return YES to disable MRaid ads
+
+    madDelegate = [[MadvertiseSDKSampleDelegate alloc] init];
     
-    MadvertiseSDKSampleDelegate *madvertiseDemoDelegate = [[[MadvertiseSDKSampleDelegate alloc] init] autorelease];
-    
-//    Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
+//    2. Create a new MadvertiseView. You can create multiple of them, e. g. one fixed and another in a ListView. 
 //
 //    withClass: MadvertiseAdClassMMA : 320x53
 //               MadvertiseAdClassMediumRectangle : 300x250
 //               MadvertiseAdClassLeaderboard : 728x90
 //               MadvertiseAdClassPortrait : 766x66
 //               MadvertiseAdClassLandscape : 1024x66
-//               MadvertiseAdClassFullscreen : 768x768
 //    
 //    secondsToRefresh: the time after which a new ad will be loaded
-    
-    MadvertiseView *ad = nil;
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        /* run something specific for the iPad */
-        
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassPortrait placementType:MRAdViewPlacementTypeInline secondsToRefresh:60];
-    } else {
-        /* run something specific for the iPhone */
-        
-        ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:60];
-//        ad = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
-    }
-    
+
+    // custom banner format ad
+    ad = [MadvertiseView loadAdWithDelegate:madDelegate withClass:MadvertiseAdClassMMA secondsToRefresh:30];
     [ad place_at_x:0 y:0];
     [self.view addSubview:ad];
     [self.view bringSubviewToFront:ad];
+
+    // ad with standard banner format
+//    ad = [MadvertiseView loadBannerWithDelegate:madDelegate secondsToRefresh:30];
+//    [ad place_at_x:0 y:0];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
+
+    // richmedia ad (overlay)
+//    ad = [MadvertiseView loadRichMediaAdWithDelegate:madDelegate];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
+
+    // preloader
+//    ad = [MadvertiseView loadPreloaderAdWithDelegate:madDelegate];
+//    [self.view addSubview:ad];
+//    [self.view bringSubviewToFront:ad];
 }
 
 - (void) viewWillAppear:(BOOL)animated {
 //  observing adLoaded and adLoadFailed Events
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedSuccessfully:) ForEvent:@"MadvertiseAdLoaded"];
     [MadvertiseView handlerWithObserver:self AndSelector:@selector(onAdLoadedFailed:) ForEvent:@"MadvertiseAdLoadFailed"];
+}
+
+- (void)viewDidUnload {
+    ad.madDelegate = nil;
+    [ad release]; ad = nil;
+    [madDelegate release]; madDelegate = nil;
     
-//  furthermore it is possible to observe the following MRaid events:
-//            MadvertiseMRaidAppShouldSuspend : app should suspend (there will be an ad event)
-//            MadvertiseMRaidAppShouldResume : app should resume
-//    
-//  Please see MadvertiseView.m for more events.  
+    [super viewDidUnload];
 }
 
 - (void) viewWillDisappear:(BOOL)animated {
@@ -83,7 +89,6 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
-
 
 #pragma mark - 
 #pragma mark Notifications

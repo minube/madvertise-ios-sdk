@@ -1,5 +1,5 @@
 
-// Copyright 2011 madvertise Mobile Advertising GmbH
+// Copyright 2012 madvertise Mobile Advertising GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,25 +17,27 @@
 
 @implementation MadvertiseView
 
-@synthesize currentAd;
 @synthesize request;
 @synthesize currentView;
+@synthesize nextView;
 @synthesize timer;
 @synthesize conn;
 @synthesize receivedData;
 @synthesize madDelegate;
 @synthesize currentAdClass;
 
-NSString * const MadvertiseAdClass_toString[] = {
-  @"mma",
-  @"medium_rectangle",
-  @"leaderboard",
-  @"fullscreen",
-  @"portrait",
-  @"landscape",
-  @"rich_media",
-  @"iphone_preloader",
-  @"ipad_preloader"
+NSString *const MadvertiseAdClass_toString[] = {
+    @"mma",
+    @"medium_rectangle",
+    @"leaderboard",
+    @"fullscreen",
+    @"portrait",
+    @"landscape",
+    @"rich_media",
+    @"iphone_preloader",
+    @"ipad_preloader",
+    @"iphone_preloader_landscape",
+    @"ipad_preloader_portrait"
 };
 
 int const MadvertiseAdClass_toWidth[] = {
@@ -47,7 +49,9 @@ int const MadvertiseAdClass_toWidth[] = {
     1024,
     320,
     320,
-    1024
+    1024,
+    480,
+    768
 };
 
 int const MadvertiseAdClass_toHeight[] = {
@@ -59,78 +63,62 @@ int const MadvertiseAdClass_toHeight[] = {
     66,
     480,
     460,
-    748
+    748,
+    300,
+    1004
 };
 
-// METHODS
-- (void) dealloc {
-  MadLog(@"Call dealloc in MadvertiseView");
-  
-  [[NSNotificationCenter defaultCenter] removeObserver: self name:UIApplicationDidEnterBackgroundNotification object:nil];
-  [[NSNotificationCenter defaultCenter] removeObserver: self name:UIApplicationDidBecomeActiveNotification object:nil];
-
-  [self.conn cancel];
-  self.conn = nil;
-  self.request = nil;
-  self.receivedData = nil;
-    
-  if (mraidView) {
-    mraidView.delegate = nil;
-  }
-
-  [self stopTimer];
-
-  if (currentView) {
-      if ([currentView isKindOfClass:[UIWebView class]]) {
-          ((UIWebView *)currentView).delegate = nil;
-          if ([currentView respondsToSelector:@selector(stopLoading)]) {
-              [((UIWebView *)currentView) stopLoading];
-          }
-      }
-      [currentView release];currentView = nil;
-  }
-  
-  [currentAd release];currentAd = nil;
-  [lock release];lock = nil;
-  [madDelegate release]; madDelegate = nil;
-
-  [super dealloc];
++ (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate {
+    return [MadvertiseView loadAdWithDelegate:delegate withClass:MadvertiseAdClassRichMedia placementType:MRAdViewPlacementTypeInterstitial secondsToRefresh:-1];
 }
 
-+ (MadvertiseView*)loadRichMediaAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate {
-  return [self loadAdWithDelegate:delegate withClass:MadvertiseAdClassRichMedia placementType:MRAdViewPlacementTypeInterstitial secondsToRefresh:-1];
++ (MadvertiseView*)loadPreloaderAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate closeButton:(Boolean)close timeToClose:(int)time {
+    // handle special case
+    if (!close && time == -1) {
+        close = YES;
+    }
+
+    MadvertiseAdClass class = MadvertiseAdClassIphonePreloader;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && UIDeviceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        class = MadvertiseAdClassIpadPreloader;
+    } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && UIDeviceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+        class = MadvertiseAdClassIpadPreloaderPortrait;
+    } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone && UIDeviceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        class = MadvertiseAdClassIphonePreloaderLandscape;
+    }
+
+    MRAdViewPlacementType placement = MRAdViewPlacementTypeInline;
+    if (close) {
+        placement = MRAdViewPlacementTypeInterstitial;
+    }
+
+    return [MadvertiseView loadAdWithDelegate:delegate withClass:class placementType:placement secondsToRefresh:time];
+}
+
++ (MadvertiseView*)loadPreloaderAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate closeButton:(Boolean)close {
+    return [MadvertiseView loadPreloaderAdWithDelegate:delegate closeButton:close timeToClose:5];
+}
+
++ (MadvertiseView*)loadPreloaderAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate {
+    return [MadvertiseView loadPreloaderAdWithDelegate:delegate closeButton:NO];
+}
+
++ (MadvertiseView*)loadBannerWithDelegate:(id<MadvertiseDelegationProtocol>)delegate secondsToRefresh:(int)secondsToRefresh {
+    MadvertiseAdClass class = MadvertiseAdClassMMA;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && UIDeviceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        class = MadvertiseAdClassLandscape;
+    } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && UIDeviceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+        class = MadvertiseAdClassPortrait;
+    }
+
+    return [MadvertiseView loadAdWithDelegate:delegate withClass:class secondsToRefresh:secondsToRefresh];
 }
 
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue secondsToRefresh:(int)secondsToRefresh {
-    return [self loadAdWithDelegate:delegate withClass:adClassValue placementType:MRAdViewPlacementTypeInline secondsToRefresh:secondsToRefresh];
+    return [MadvertiseView loadAdWithDelegate:delegate withClass:adClassValue placementType:MRAdViewPlacementTypeInline secondsToRefresh:secondsToRefresh];
 }
 
 + (MadvertiseView*)loadAdWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
-  BOOL enableDebug = NO;
-
-#ifdef DEBUG
-  enableDebug = YES;
-#endif
-
-  // debugging
-  if([delegate respondsToSelector:@selector(debugEnabled)]){
-    enableDebug = [delegate debugEnabled];
-  }
-
-  // Download-Tracker
-  if([delegate respondsToSelector:@selector(downloadTrackerEnabled)]){
-    if([delegate downloadTrackerEnabled] == YES){
-      [MadvertiseTracker setDebugMode: enableDebug];
-      [MadvertiseTracker setProductToken:[delegate appId]];
-      [MadvertiseTracker enable];
-    }
-  }
-    
-  // handle special rich media case
-  if (adClassValue == MadvertiseAdClassRichMedia) {
-      secondsToRefresh = -1;
-  }
-    
     return [[[MadvertiseView alloc] initWithDelegate:delegate withClass:adClassValue placementType:type secondsToRefresh:secondsToRefresh] autorelease];
 }
 
@@ -138,55 +126,127 @@ int const MadvertiseAdClass_toHeight[] = {
     [[NSNotificationCenter defaultCenter] addObserver:observer selector:selector name:event object:nil];
 }
 
+- (void) dealloc {
+    MadLog(@"Call dealloc in MadvertiseView");
+
+    if (self.timer && [self.timer isValid]) {
+        [self.timer invalidate];
+    }
+
+    [[NSNotificationCenter defaultCenter] removeObserver: self name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver: self name:UIApplicationDidBecomeActiveNotification object:nil];
+
+    [self.conn cancel];
+    self.conn = nil;
+    self.request = nil;
+    self.receivedData = nil;
+
+    if (currentView) {
+        currentView.delegate = nil;
+    }
+    [currentView release]; currentView = nil;
+
+    if (nextView) {
+        nextView.delegate = nil;
+    }
+    [nextView release]; nextView = nil;
+
+    [lock release]; lock = nil;
+    madDelegate = nil;
+
+    [super dealloc];
+}
+
+- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
+    BOOL enableDebug = NO;
+
+#ifdef DEBUG
+    enableDebug = YES;
+#endif
+
+    madDelegate = delegate;
+
+    // debugging
+    if ([madDelegate respondsToSelector:@selector(debugEnabled)]) {
+        enableDebug = [madDelegate debugEnabled];
+    }
+
+    // Download-Tracker
+    if ([madDelegate respondsToSelector:@selector(downloadTrackerEnabled)] && [madDelegate respondsToSelector:@selector(appId)]) {
+        if ([madDelegate downloadTrackerEnabled] == YES) {
+            [MadvertiseTracker setDebugMode: enableDebug];
+            [MadvertiseTracker enableWithToken:[madDelegate appId]];
+        }
+    }
+
+    if ((self = [super init])) {        
+        self.clipsToBounds = YES;
+
+        currentView = [[MRAdView alloc] initWithFrame:CGRectMake(0, 0, 0, 0) 
+                                      allowsExpansion:YES
+                                     closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
+                                        placementType:placementType];
+        [self addSubview: currentView];
+        [self setHidden:YES];
+
+        currentAdClass      = adClassValue;
+        interval            = secondsToRefresh;
+        reload              = YES;
+        suspended           = NO;
+        request             = nil;
+        receivedData        = nil;
+        responseCode        = 200;
+        placementType       = type;
+        animationDuration   = 0.5;
+        animationType       = MadvertiseAnimationClassCurlDown;
+        server_url          = @"http://ad.madvertise.de";
+        lock                = [[NSLock alloc] init];
+
+        if ([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
+            animationDuration = [madDelegate durationOfBannerAnimation];
+        }
+
+        if ([madDelegate respondsToSelector:@selector(bannerAnimationType)]) {
+            animationType = [madDelegate bannerAnimationType];
+        }
+
+        if ([madDelegate respondsToSelector:@selector(adServer)]) {
+            server_url = [madDelegate adServer];
+        }
+
+        // handle special cases
+        if (currentAdClass == MadvertiseAdClassRichMedia) {
+            interval = -1;
+            animationType = MadvertiseAnimationClassNone;
+            animationDuration = 0.0;
+        } else if (currentAdClass == MadvertiseAdClassIphonePreloader ||
+                   currentAdClass == MadvertiseAdClassIpadPreloader ||
+                   currentAdClass == MadvertiseAdClassIpadPreloaderPortrait ||
+                   currentAdClass == MadvertiseAdClassIphonePreloaderLandscape) {
+            reload = NO;
+        }
+
+        // load first ad
+        [self loadAd];
+            
+        // Notifications for reloadable ad classes
+        if (reload) {
+            [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stopTimer) name:UIApplicationDidEnterBackgroundNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(createAdReloadTimer) name:UIApplicationDidBecomeActiveNotification object:nil];
+        }
+    }
+
+    return self;
+}
+
 - (void)place_at_x:(int) x_pos y:(int) y_pos {
     x = x_pos;
     y = y_pos;
-    
+
     if (currentAdClass == MadvertiseAdClassRichMedia) {
         x = 0;
         y = 0;
     }
-}
-
-// helper method for initialization
-- (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh {
-
-  if ((self = [super init])) {
-    MadLog(@"madvertise SDK %@", MADVERTISE_SDK_VERION);
-
-    self.clipsToBounds = YES;
-    
-    currentView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    [self addSubview: currentView];
-    [self setHidden:YES];
-    
-    currentAdClass      = adClassValue;
-    interval            = secondsToRefresh;
-    request             = nil;
-    receivedData        = nil;
-    responseCode        = 200;
-    self.timer          = nil;
-    isExpanded          = false;
-    placementType       = type;
-    madDelegate         = delegate;
-    [madDelegate retain];
-
-    // load first ad
-    lock = [[NSLock alloc] init];
-    [self loadAd];
-
-    animationDuration = 0.75;
-
-    if ([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
-      animationDuration = [madDelegate durationOfBannerAnimation];
-    }
-
-    // Notifications
-    [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(stopTimer) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self selector:@selector(createAdReloadTimer) name:UIApplicationDidBecomeActiveNotification object:nil];
-  }
-
-  return self;
 }
 
 #pragma mark - server connection handling
@@ -210,67 +270,59 @@ int const MadvertiseAdClass_toHeight[] = {
     MadLog(@"Failed to receive ad");
     MadLog(@"%@",[error description]);
 
-    // dispatch status notification
+    self.request = nil;
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
 
-    self.request = nil;
+    [lock unlock];
+    [self createAdReloadTimer];
 }
-
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
     return nil;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if (responseCode == 200 && !isExpanded) {
+    if (responseCode == 200) {
         MadLog(@"Deserializing json");
-        
+
         NSDictionary *dictionary = [receivedData objectFromJSONData];
 
         MadLog(@"Creating ad");
-        [currentAd release];
-        currentAd = [[MadvertiseAd alloc] initFromDictionary:dictionary];
-      
-        [self displayView];
-    } else if (!isExpanded) {
-        // dispatch status notification
+        MadvertiseAd *ad = [[MadvertiseAd alloc] initFromDictionary:dictionary];
+        [ad autorelease];
+        [self createNewViewWithAd:ad];
+    } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
     }
 
     self.request = nil;
     self.receivedData = nil;
+    [lock unlock];
 }
 
-
-// generate request, that is send to the ad server
 - (void)loadAd {
-    [self retain];
-    [lock lock];
-
-    if (self.request){
-      MadLog(@"loadAd - returning because another request is running");
-      [lock unlock];
-      [self release];
-      return;
+    if (![lock tryLock]) {
+        return;
     }
 
-    NSString *server_url = @"http://ad.madvertise.de";
-    if (madDelegate != nil && [madDelegate respondsToSelector:@selector(adServer)]) {
-      server_url = [madDelegate adServer];
-    }
-    MadLog(@"Using url: %@", server_url);
+    MadLog(@"Load ad");
 
-    // always supported request parameter
-    if (madDelegate == nil || ![madDelegate respondsToSelector:@selector(appId)]) {
-      MadLog(@"delegate does not respond to appId ! return ...");
-      [self release];
-      return;
+    if (self.request || suspended) {
+        MadLog(@"Load ad - returning because another request is running.");
+        [lock unlock];
+        return;
+    }
+
+    if (![madDelegate respondsToSelector:@selector(appId)]) {
+        MadLog(@"Load ad - returning because delegate is missing.");
+        [lock unlock];
+        [self createAdReloadTimer];
+        return;
     }
 
     NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/site/%@", server_url, [madDelegate appId]]];
-    MadLog(@"AppId : %@", [madDelegate appId]);
 
-    MadLog(@"Init new request");
     self.request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
 
     NSMutableDictionary* headers = [[NSMutableDictionary alloc] init];
@@ -281,7 +333,7 @@ int const MadvertiseAdClass_toHeight[] = {
 
     NSMutableDictionary* post_params = [[NSMutableDictionary alloc] init];
     self.receivedData = [NSMutableData data];
-    
+
     CGSize parent_size = [self getParentViewDimensions];
     CGSize screen_size = [MadvertiseUtilities getScreenResolution];
 
@@ -301,9 +353,9 @@ int const MadvertiseAdClass_toHeight[] = {
     [post_params setValue: [NSNumber numberWithFloat:screen_size.width]  forKey:MADVERTISE_DEVICE_WIDTH_KEY];
     [post_params setValue: [NSNumber numberWithFloat:screen_size.height] forKey:MADVERTISE_DEVICE_HEIGHT_KEY];
     [post_params setValue: [MadvertiseUtilities getDeviceOrientation]    forKey:MADVERTISE_ORIENTATION_KEY];
-    [post_params setValue: [UserAgentString() urlEncodeUsingEncoding:NSUTF8StringEncoding] forKey:MADVERTISE_USER_AGENT_KEY];
+    [post_params setValue: [MadvertiseUtilities urlEncodeUsingEncoding:NSUTF8StringEncoding withString:UserAgentString()] forKey:MADVERTISE_USER_AGENT_KEY];
     [post_params setValue: (([madDelegate respondsToSelector:@selector(debugEnabled)] && [madDelegate debugEnabled]) ? @"true" : @"false") forKey:MADVERTISE_DEBUG_KEY];
-    
+
     if (!([madDelegate respondsToSelector:@selector(mRaidDisabled)] && [madDelegate mRaidDisabled])) {
         [post_params setValue: @"true"                                forKey:MADVERTISE_MRAID_KEY];
     }
@@ -325,7 +377,7 @@ int const MadvertiseAdClass_toHeight[] = {
 
     NSString *body = @"";
     unsigned int n = 0;
-    
+
     for (NSString* key in post_params) {
         body = [body stringByAppendingString:[NSString stringWithFormat:@"%@=%@", key, [post_params objectForKey:key]]];
         if (++n != [post_params count] ) {
@@ -343,165 +395,84 @@ int const MadvertiseAdClass_toHeight[] = {
 
     [headers release];
     [post_params release];
-    [lock unlock];
-    [self release];
-}
-
-- (void)openInSafariButtonPressed:(id)sender {
-    MadLog(@"openInSafariButtonPressed called");
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:currentAd.clickUrl]];
 }
 
 - (void)stopTimer {
-    if (self.timer && [timer isValid]) {
+    if (self.timer && [self.timer isValid] && reload) {
         MadLog(@"Stop Ad reload timer");
         [self.timer invalidate];
     }
 }
 
 - (void)createAdReloadTimer {
-    // prepare automatic refresh
-    if (interval > 0) {
+    if (suspended) {
+        return;
+    }
+
+    if (interval > 0 && (!self.timer || ![self.timer isValid])) {
         MadLog(@"Init Ad reload timer");
-        [self stopTimer];
-        self.timer = [NSTimer scheduledTimerWithTimeInterval: interval target: self selector: @selector(timerFired:) userInfo: nil repeats: YES];
+        self.timer = [NSTimer scheduledTimerWithTimeInterval: interval target: self selector: @selector(timerFired:) userInfo: nil repeats: NO];
+    }
+
+    if (!reload) {
+        interval = -1;
     }
 }
 
-// ad has been touched, open click_url from he current app according to click_action
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    MadLog(@"touchesBegan");
-    if (currentAd.shouldOpenInAppBrowser) {
-        [self openInAppBrowserWithUrl: currentAd.clickUrl];
-    }
-    else {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:currentAd.clickUrl]];
-    }
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-//  [super touchesMoved:touches withEvent:event];
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-//  [super touchesEnded:touches withEvent:event];
-}
-
-// Refreshing the ad
 - (void)timerFired: (NSTimer *) theTimer {
-  if (madDelegate != nil && [madDelegate respondsToSelector:@selector(appId)]) {
-    MadLog(@"Ad reloading");
-    [self loadAd];
-  }
+    MadLog(@"Timer fired.");
+    [self.timer invalidate];
+
+    if (reload) {
+        [self loadAd];
+    } else {
+        [self setHidden:YES];
+    }
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)aWebView {
-    if (aWebView != currentView) {
-        [self swapView:aWebView oldView:currentView];
-    }
-    
-    [self setHidden:NO];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:self];
-}
+- (void) createNewViewWithAd: (MadvertiseAd *) ad {
+    MadLog(@"Create new ad view");
 
-- (void) displayView {
-    MadLog(@"Display view");
-    if (isExpanded) {
+    if (ad == nil || !ad.isValid || suspended) {
+        MadLog(@"No ad to show or reloading suspended");
         return;
     }
-    
-    if (currentAd == nil) {
-        MadLog(@"No ad to show");
-        [self setUserInteractionEnabled:NO];
-        return;
-    }
-    
-    [self setUserInteractionEnabled:YES];
 
-    self.frame = CGRectMake(x, y , ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
-    
-    CGRect frame = CGRectMake(0, 0, ([currentAd width] != 0) ? [currentAd width] : MadvertiseAdClass_toWidth[currentAdClass], ([currentAd height] != 0) ? [currentAd height] : MadvertiseAdClass_toHeight[currentAdClass]);
-    
-    if ([currentAd isRichMedia]) {
-        mraidView = [[MRAdView alloc] initWithFrame:frame 
-                                                allowsExpansion:YES
-                                                closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
-                                                placementType:placementType];
-        mraidView.delegate = self;
-        
-        if ([currentAd isLoadableViaUrl]) {
-            [mraidView loadCreativeFromURL:[currentAd url]];
-        }
-        else {
-            [mraidView loadCreativeWithHTMLString:[currentAd to_html] baseURL:nil];
-        }
+    self.frame = CGRectMake(x, y , ([ad width] != 0) ? [ad width] : MadvertiseAdClass_toWidth[currentAdClass], ([ad height] != 0) ? [ad height] : MadvertiseAdClass_toHeight[currentAdClass]);
+
+    CGRect frame = CGRectMake(0, 0, ([ad width] != 0) ? [ad width] : MadvertiseAdClass_toWidth[currentAdClass], ([ad height] != 0) ? [ad height] : MadvertiseAdClass_toHeight[currentAdClass]);
+
+    nextView = [[MRAdView alloc] initWithFrame:frame 
+                               allowsExpansion:YES
+                              closeButtonStyle:MRAdViewCloseButtonStyleAdControlled
+                                 placementType:placementType];
+    nextView.delegate = self;
+
+    if ([ad isLoadableViaUrl]) {
+        [nextView loadCreativeFromURL:[ad url]];
     }
     else {
-        UIWebView* view = [[UIWebView alloc] initWithFrame:frame];
-        [view setUserInteractionEnabled:NO];
-        view.delegate = self;
-        [view loadHTMLString:[currentAd to_html] baseURL:nil];
+        [nextView loadCreativeWithHTMLString:[ad to_html] baseURL:nil];
     }
 }
 
-- (void)openInAppBrowserWithUrl: (NSString*)url {
-    [self stopTimer];
-    isExpanded = true;
-    
-    if ([madDelegate respondsToSelector:@selector(inAppBrowserWillOpen)]) {
-        [madDelegate inAppBrowserWillOpen];
-    }
-    
-    MPAdBrowserController *browser = [[MPAdBrowserController alloc] initWithURL:[NSURL URLWithString:url] delegate:self];
-    [[self viewControllerForPresentingModalView] presentModalViewController:browser animated:YES];
-    [browser release];
-}
+- (void)swapViews {
+     MadLog(@"Swap ad views");
 
-- (BOOL)webView:(UIWebView*)webView shouldStartLoadWithRequest:(NSURLRequest*)urlRequest navigationType:(UIWebViewNavigationType)navigationType {
-    NSURL *url = [urlRequest URL];
-    NSString *urlStr = [url absoluteString];
-  
-    if ([urlStr rangeOfString:@"inappbrowser"].location != NSNotFound) {
-        [self openInAppBrowserWithUrl:urlStr];
-    } else if ([urlStr rangeOfString:@"exitapp"].location != NSNotFound) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlStr]];
-    }
-    
-    return YES;   
-}
-
-- (void)swapView:(UIWebView*)newView oldView:(UIWebView*) oldView {
-    MadvertiseAnimationClass animationTyp;
-  
-    if ([madDelegate respondsToSelector:@selector(bannerAnimationTyp)]) {
-        animationTyp = [madDelegate bannerAnimationTyp];
-    } else {
-        animationTyp = MadvertiseAnimationClassNone;
+    if (suspended) {
+        MadLog(@"Reload suspended");
+        return;
     }
 
-    if (currentAdClass == MadvertiseAdClassRichMedia) {
-        animationTyp = MadvertiseAnimationClassNone;
-    }
-    
-    if (animationTyp == MadvertiseAnimationClassNone) {
-      [self addSubview:newView];
-      [self bringSubviewToFront:newView];
-      [oldView removeFromSuperview];
-      currentView = newView;
-      return;
-    }
-  
     UIViewAnimationTransition transition = UIViewAnimationTransitionNone;
-  
     float newStartAlpha = 1;
     float newEndAlpha = 1;
     float oldEndAlpha = 1;
+    CGRect newStart = [nextView frame];
+    CGRect newEnd = [nextView frame];
+    CGRect oldEnd = [currentView frame];
 
-    CGRect newStart = [newView frame];
-    CGRect newEnd = [newView frame];
-    CGRect oldEnd = [oldView frame];
-  
-    switch (animationTyp) {
+    switch (animationType) {
         case MadvertiseAnimationClassLeftToRight:
             newStart.origin = CGPointMake(-newStart.size.width, newStart.origin.y);
             oldEnd.origin = CGPointMake(oldEnd.origin.x + oldEnd.size.width, oldEnd.origin.y);
@@ -513,8 +484,6 @@ int const MadvertiseAdClass_toHeight[] = {
         case MadvertiseAnimationClassCurlDown:
             transition = UIViewAnimationTransitionCurlDown;
             break;
-        case MadvertiseAnimationClassNone:
-            break;
         case MadvertiseAnimationClassFade:
             newStartAlpha = 0;
             newEndAlpha = 1;
@@ -523,37 +492,33 @@ int const MadvertiseAdClass_toHeight[] = {
         default:
             break;
     }
-  
-    newView.frame = newStart;
-    newView.alpha = newStartAlpha;
-  
+
+    nextView.frame = newStart;
+    nextView.alpha = newStartAlpha;
+
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
     [UIView setAnimationDuration:animationDuration];
-  
+
     if(transition) {
         [UIView setAnimationTransition:transition forView:self cache:YES];
     }
-  
-    newView.alpha = newEndAlpha;
-    oldView.alpha = oldEndAlpha;
-    newView.frame = newEnd;
-    oldView.frame = oldEnd;
-    [self addSubview:newView];
-    [newView release];
- 
-    [UIView setAnimationDelegate:oldView];
+
+    nextView.alpha = newEndAlpha;
+    currentView.alpha = oldEndAlpha;
+    nextView.frame = newEnd;
+    currentView.frame = oldEnd;
+    [self addSubview:nextView];
+
+    [UIView setAnimationDelegate:currentView];
     [UIView setAnimationDidStopSelector:@selector(removeFromSuperview)];
     [UIView commitAnimations];
 
-    if ([currentView isKindOfClass:[UIWebView class]]) {
-        ((UIWebView *)currentView).delegate = nil;
-        if ([currentView respondsToSelector:@selector(stopLoading)]) {
-            [((UIWebView *)currentView) stopLoading];
-        }
-    }
-    
-    self.currentView = newView;
+    currentView.delegate = nil;
+    [currentView release]; currentView = nil;
+
+    currentView = nextView;
+    nextView = nil;
 }
 
 - (UIViewController *)viewControllerForPresentingModalView {
@@ -573,29 +538,34 @@ int const MadvertiseAdClass_toHeight[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdClosed" object:self];
 }
 
-- (void)adDidLoad:(MRAdView *)adView {
+- (void)adDidLoad:(MRAdView *)adView {    
     [self setHidden:NO];
-    [self swapView:adView oldView:currentView];
+    [self swapViews];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:self];
+
+    [self createAdReloadTimer];
 }
 
 - (void)adDidFailToLoad:(MRAdView *)adView {
     [self setHidden:YES];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:self];
+
+    [self createAdReloadTimer];
 }
 
 - (void)appShouldSuspendForAd:(MRAdView *)adView {
+    suspended = YES;
     [self stopTimer];
-    isExpanded = true;
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAppShouldSuspend" object:self];
 }
 
 - (void)appShouldResumeFromAd:(MRAdView *)adView {
-    isExpanded = false;
+    suspended = NO;
     [self createAdReloadTimer];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAppShouldResume" object:self];
 }
 
@@ -612,27 +582,25 @@ int const MadvertiseAdClass_toHeight[] = {
 // Called just before the ad is hidden.
 - (void)adWillHide:(MRAdView *)adView {
     [self stopTimer];
-    isExpanded = true;
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillHide" object:self];
 }
 
 // Called just after the ad has been hidden.
 - (void)adDidHide:(MRAdView *)adView {    
     self.frame = CGRectMake(x, y , 0, 0);
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidHide" object:self];
 }
 
 // Called just before the ad expands.
 - (void)willExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
     [self stopTimer];
-    isExpanded = true;
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdWillExpand" object:self];
 }
 
 // Called just after the ad has expanded.
 - (void)didExpandAd:(MRAdView *)adView toFrame:(CGRect)frame {
-    isExpanded = true;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidExpand" object:self];
 }
 
@@ -646,6 +614,7 @@ int const MadvertiseAdClass_toHeight[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidClose" object:self];
 }
 
+// Called if the requests a custom close
 - (void)ad:(MRAdView *)adView didRequestCustomCloseEnabled:(BOOL)enabled {
     if (enabled) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidRequestCustomClose" object:self];
@@ -655,33 +624,14 @@ int const MadvertiseAdClass_toHeight[] = {
     }
 }
 
-#pragma mark -
-#pragma mark MPAdBrowserControllerDelegate
-
-- (void)dismissBrowserController:(MPAdBrowserController *)browserController {
-    [self dismissBrowserController:browserController animated:YES];
-}
-
-- (void)dismissBrowserController:(MPAdBrowserController *)browserController animated:(BOOL)animated {
-	[[self viewControllerForPresentingModalView] dismissModalViewControllerAnimated:animated];
-    
-    if ([madDelegate respondsToSelector:@selector(inAppBrowserClosed)]) {
-        [madDelegate inAppBrowserClosed];
-    }
-    
-    isExpanded = false;
-    [self createAdReloadTimer];
-}
-
 #pragma mark - private methods section
 
 - (CGSize) getParentViewDimensions {
-
-  if([self superview] != nil){
-    UIView *parent = [self superview];
-    return CGSizeMake(parent.frame.size.width, parent.frame.size.height);
-  }
-  return CGSizeMake(0, 0);
+    if([self superview] != nil){
+        UIView *parent = [self superview];
+        return CGSizeMake(parent.frame.size.width, parent.frame.size.height);
+    }
+    return CGSizeMake(0, 0);
 }
 
 @end
