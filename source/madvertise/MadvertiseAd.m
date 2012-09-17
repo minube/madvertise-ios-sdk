@@ -37,9 +37,9 @@
 
       clickUrl  = [[dictionary objectForKey:@"click_url"] retain];
       text      = [([dictionary objectForKey:@"text"] ?: @"") retain];
-      hasBanner = [[dictionary objectForKey:@"has_banner"] boolValue];
+      hasBanner = [[dictionary objectForKey:@"has_banner"] class] != [NSNull class] ? [[dictionary objectForKey:@"has_banner"] boolValue] : NO;
       markup    = [([dictionary objectForKey:@"markup"] ?: @"") retain];
-      shouldOpenInAppBrowser = [[dictionary objectForKey:@"should_open_in_app"] boolValue];
+      shouldOpenInAppBrowser = [[dictionary objectForKey:@"should_open_in_app"] class] != [NSNull class] ? [[dictionary objectForKey:@"should_open_in_app"] boolValue] : NO;
       
       trackingArray = [dictionary objectForKey:@"tracking"];
       [trackingArray retain];
@@ -57,7 +57,7 @@
               NSDictionary* rm = [[dictionary objectForKey:@"banner"] objectForKey:@"rich_media"];
               richmediaUrl = [[rm objectForKey:@"full_url"] retain];
               richmediaMarkup = [[rm objectForKey:@"markup"] retain];
-              isMraid = [[rm objectForKey:@"mraid"] boolValue];
+              isMraid = [[rm objectForKey:@"mraid"] class] != [NSNull class] ? [[rm objectForKey:@"mraid"] boolValue] : NO;
               
               id w = [rm objectForKey:@"width"];
               if (w) {
