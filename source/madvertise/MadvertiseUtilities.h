@@ -31,7 +31,7 @@
 #define MadLog(format, ...)
 #endif
 
-#define MADVERTISE_SDK_VERION @"5.1"
+#define MADVERTISE_SDK_VERION @"5.1.1"
 
 #define MADVERTISE_USER_AGENT_KEY @"ua"
 #define MADVERTISE_APP_KEY @"app"
@@ -61,6 +61,7 @@
 #define MADVERTISE_PARENT_WIDTH_KEY @"parent_width"
 #define MADVERTISE_MRAID_KEY @"mraid"
 #define MADVERTISE_TRACKING_KEY @"tracking_data"
+#define MADVERTISE_ADVERTISER_IDENTIFIER_KEY @"id4ads"
 
 NSString *UserAgentString(void);
 
@@ -73,6 +74,7 @@ NSString *UserAgentString(void);
 + (NSString*) getAppVersion;
 + (CGSize)    getScreenResolution;
 + (NSString*) getDeviceOrientation;
++ (NSString*) getIdentifierForAdvertiser;
 + (NSString*) urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string;
 + (BOOL)      isConnectionAvailable;
 

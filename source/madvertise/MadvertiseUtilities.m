@@ -205,6 +205,14 @@ NSString* UserAgentString() {
     }
 }
 
++ (NSString*) getIdentifierForAdvertiser {
+    UIDevice *device = [UIDevice currentDevice];
+    if ([device respondsToSelector:@selector(identifierForAdvertising)]) {
+        return [[device identifierForAdvertising] UUIDString];
+    }
+    return nil;
+}
+
 + (NSString *)urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string {
 	return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
                                                                 (CFStringRef)string,

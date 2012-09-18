@@ -340,6 +340,7 @@ int const MadvertiseAdClass_toHeight[] = {
     [post_params setValue: @"true"                                       forKey:MADVERTISE_APP_KEY];
     [post_params setValue: [MadvertiseUtilities getMacMD5Hash]           forKey:MADVERTISE_MACMD5_KEY];
     [post_params setValue: [MadvertiseUtilities getMacSHA1Hash]          forKey:MADVERTISE_MACSHA1_KEY];
+    [post_params setValue: [MadvertiseUtilities getIdentifierForAdvertiser] forKey:MADVERTISE_ADVERTISER_IDENTIFIER_KEY];
     [post_params setValue: [MadvertiseUtilities getIP]                   forKey:MADVERTISE_IP_KEY];
     [post_params setValue: @"json"                                       forKey:MADVERTISE_FORMAT_KEY];
     [post_params setValue: @"iPhone-SDK "                                forKey:MADVERTISE_REQUESTER_KEY];
