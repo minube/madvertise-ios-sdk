@@ -1,4 +1,4 @@
-h1. madvertise iOS SDK (Version 5.1.0)
+h1. madvertise iOS SDK (Version 5.1.1)
 
 h2. Intro
 
