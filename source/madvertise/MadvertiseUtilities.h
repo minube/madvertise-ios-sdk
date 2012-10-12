@@ -24,6 +24,7 @@
 #include <sys/sysctl.h>
 #include <net/if.h>
 #include <net/if_dl.h>
+#import <AdSupport/AdSupport.h>
 
 #if DEBUG
 #define MadLog(format, ...) [MadvertiseUtilities logWithPath:__FILE__ line:__LINE__ string:(format), ## __VA_ARGS__]

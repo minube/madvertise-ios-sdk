@@ -206,9 +206,8 @@ NSString* UserAgentString() {
 }
 
 + (NSString*) getIdentifierForAdvertiser {
-    UIDevice *device = [UIDevice currentDevice];
-    if ([device respondsToSelector:@selector(identifierForAdvertising)]) {
-        return [[device identifierForAdvertising] UUIDString];
+    if (NSClassFromString(@"ASIdentifierManager") && [[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled]) {
+        return [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
     }
     return nil;
 }
