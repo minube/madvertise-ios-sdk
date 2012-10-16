@@ -205,6 +205,13 @@ NSString* UserAgentString() {
     }
 }
 
++ (NSString*) getIdentifierForAdvertiser {
+    if (NSClassFromString(@"ASIdentifierManager") && [[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled]) {
+        return [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
+    }
+    return nil;
+}
+
 + (NSString *)urlEncodeUsingEncoding:(NSStringEncoding)encoding withString:(NSString *)string {
 	return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
                                                                 (CFStringRef)string,

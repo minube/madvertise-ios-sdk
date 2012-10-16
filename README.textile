@@ -1,4 +1,4 @@
-h1. madvertise iOS SDK (Version 5.1.0)
+h1. madvertise iOS SDK (Version 5.1.1)
 
 h2. Intro
 
@@ -19,12 +19,13 @@ h2. Preparations
 * Install Xcode
 * Install Git (which is part of the Apple Command Line Tools)
 * Clone this repository: git clone git@github.com:madvertise/madvertise-ios-sdk.git
-* Always include the following 4 libraries from Apple in you projects:
+* Always include the following 6 libraries from Apple in you projects:
   - Foundation.framework
   - UIKit.framework
   - CoreGraphics.framework
   - QuartzCore.framework
   - SystemConfiguration.framework
+  - AdSupport.framework
 * Sign up at "madvertise":https://app.madvertise.de/register
   - If you don't have already an account, please sign up.
   - Create an app and copy the token, it will identify the requests send to our ad-server.
@@ -53,7 +54,7 @@ h2. Using the SDK to show ads
 
 bc.. #import "YourSDKDelegate.h"
 
-@implementation YourSDKDelegate 
+@implementation YourSDKDelegate
 
 - (NSString *) appId {
   return @"TestTokn";
@@ -61,13 +62,13 @@ bc.. #import "YourSDKDelegate.h"
 
 @end
 
-h3. Embedding the banner type Rich Media 
+h3. Embedding the banner type Rich Media
 
 Please consider the differences in behaviour and embedding of those ads to guarantee a seamlessly working user experience!
 
-Make sure you treat RM in a separate View. If you plan on requesting Rich Media, please do this from a separated, second view rather than using the same view for ordinary banners and Rich Media banners. This helps to avoid ugly transitions or more severe problems. 
+Make sure you treat RM in a separate View. If you plan on requesting Rich Media, please do this from a separated, second view rather than using the same view for ordinary banners and Rich Media banners. This helps to avoid ugly transitions or more severe problems.
 
-Sample Code for requesting Rich Media (in overlay, view "ad") and standard mma (shifted to the lower corner of iPhone / iPad, "ad2") simultaneously is as follows (MadvertiseSDKSampleViewController.m in the madvertise Sample app): 
+Sample Code for requesting Rich Media (in overlay, view "ad") and standard mma (shifted to the lower corner of iPhone / iPad, "ad2") simultaneously is as follows (MadvertiseSDKSampleViewController.m in the madvertise Sample app):
 
 bc. MadvertiseView *ad = nil;
 MadvertiseView *ad2 = nil;
@@ -81,7 +82,7 @@ if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
     [self.view addSubview:ad2];
     [self.view bringSubviewToFront:ad2];
 } else {
-    //iPhone: Load RichMedia in Overlay (ad2) , load MMA (ad)        
+    //iPhone: Load RichMedia in Overlay (ad2) , load MMA (ad)
     ad = [MadvertiseView loadAdWithDelegate:madvertiseDemoDelegate withClass:MadvertiseAdClassMMA placementType:MRAdViewPlacementTypeInline secondsToRefresh:30];
     ad2 = [MadvertiseView loadRichMediaAdWithDelegate:madvertiseDemoDelegate]; // fullscreen richmedia ad (overlay)
     [ad place_at_x:0 y:407];
@@ -91,17 +92,17 @@ if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
     [self.view bringSubviewToFront:ad2];
 }
 
-* Please don't shift or move the Rich Media container. This helps preventing unintended ad behaviour / blocking of the app. Generally Rich Media should be able to take the whole screen of your app (though it doesn't necessarily do so) like an interstitial.  
-* Sticking to the common integration process is a good idea. This means using the latest version of our SDK as well as using the TestTokn first. If your app shows working Rich Media ads using the test token, this means that from a technical point of view ad delivery is working. 
-Real ads should not pose a problem for your ad then, though at first they may not show. The reason for this: When switching to your live token, it can take a time until your app is ready to get Rich Media ads, we kindly ask you to be patient here (campaigns may be running out at the moment / your app maybe isn't categorized already)  Please don't hesitate to contact our support team (support@madvertise.com) in case of further questions - other than that, happy integrating! 
+* Please don't shift or move the Rich Media container. This helps preventing unintended ad behaviour / blocking of the app. Generally Rich Media should be able to take the whole screen of your app (though it doesn't necessarily do so) like an interstitial.
+* Sticking to the common integration process is a good idea. This means using the latest version of our SDK as well as using the TestTokn first. If your app shows working Rich Media ads using the test token, this means that from a technical point of view ad delivery is working.
+Real ads should not pose a problem for your ad then, though at first they may not show. The reason for this: When switching to your live token, it can take a time until your app is ready to get Rich Media ads, we kindly ask you to be patient here (campaigns may be running out at the moment / your app maybe isn't categorized already)  Please don't hesitate to contact our support team (support@madvertise.com) in case of further questions - other than that, happy integrating!
 
 h3.    The MRaid standard and Rich Media
 
-The fact that developers can request both the banner type Rich Media and pass the option mraid = true for „normal“ banner types may be confusing. 
+The fact that developers can request both the banner type Rich Media and pass the option mraid = true for „normal“ banner types may be confusing.
 
 Rich Media: Please bear in mind that _Rich Media_ first and foremost is a _special banner type_. It gets loaded in an overlay over your content, whereas normal banners have their fixed space allocated. Thus, banner type Rich Media makes a close button mandatory, normal bannertypes don’t.
 
-_MRaid_ on the other hand is a _technical standard_ which makes it possible to deliver more complex ads. Since newer version of  our SDKs are MRaid-compatible. What does this mean? When you ask for a regular banner type (MMA, Portrait etc.) our server will deliver either a 
+_MRaid_ on the other hand is a _technical standard_ which makes it possible to deliver more complex ads. Since newer version of  our SDKs are MRaid-compatible. What does this mean? When you ask for a regular banner type (MMA, Portrait etc.) our server will deliver either a
 
 * normal banner in the requested format, or an
 * MRaid-compatible ad which has the requested banner size as inital state.

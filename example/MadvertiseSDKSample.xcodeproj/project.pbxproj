@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		378ADEE61520FF53001FBE33 /* MPAdBrowserController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 378ADEE51520FF53001FBE33 /* MPAdBrowserController.xib */; };
+		4D0808A416285A5400293077 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0808A21628594800293077 /* AdSupport.framework */; };
 		4D3A188A151B96D000E0D347 /* MRAID.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4D3A1889151B96D000E0D347 /* MRAID.bundle */; };
 		4D3A188C151B96E100E0D347 /* MPCloseButtonX.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D3A188B151B96E100E0D347 /* MPCloseButtonX.png */; };
 		4D3A188E151B96E800E0D347 /* MPCloseButtonX@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D3A188D151B96E800E0D347 /* MPCloseButtonX@2x.png */; };
@@ -48,6 +49,7 @@
 /* Begin PBXFileReference section */
 		378ADEE51520FF53001FBE33 /* MPAdBrowserController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MPAdBrowserController.xib; path = ../source/MRAID/MPAdBrowserController.xib; sourceTree = "<group>"; };
 		4D059B3714FE58D100BB8173 /* MRAdView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MRAdView.h; path = ../../source/MRAID/MRAdView.h; sourceTree = "<group>"; };
+		4D0808A21628594800293077 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		4D37F6B0151A3873006E3AEF /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		4D3A1889151B96D000E0D347 /* MRAID.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = MRAID.bundle; path = ../source/MRAID/MRAID.bundle; sourceTree = "<group>"; };
 		4D3A188B151B96E100E0D347 /* MPCloseButtonX.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MPCloseButtonX.png; path = ../source/MRAID/MPCloseButtonX.png; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D0808A416285A5400293077 /* AdSupport.framework in Frameworks */,
 				4D62D12C15DA7B3600CE826C /* SystemConfiguration.framework in Frameworks */,
 				5B4E254913F0360300F67F5A /* libmadvertise-ios-sdk.a in Frameworks */,
 				6D47223E13AA1C9700858222 /* QuartzCore.framework in Frameworks */,
@@ -145,6 +148,7 @@
 		6D9F920213AA132C009DEF37 = {
 			isa = PBXGroup;
 			children = (
+				4D0808A21628594800293077 /* AdSupport.framework */,
 				378ADEE51520FF53001FBE33 /* MPAdBrowserController.xib */,
 				4D3A188D151B96E800E0D347 /* MPCloseButtonX@2x.png */,
 				4D3A188B151B96E100E0D347 /* MPCloseButtonX.png */,
@@ -378,7 +382,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -427,7 +431,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DDEBUG";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -448,7 +452,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PROVISIONING_PROFILE = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
