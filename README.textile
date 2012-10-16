@@ -38,12 +38,31 @@ The SDK comes with a very simple example, how to integrate the SDK in your APP. 
 
 h2. Using the SDK to show ads
 
-* Include the SDK project located at [PROJECT_ROOT]/source/ via "[right-click on root project]/Add/Existing Files ..."
+* Include the SDK project-file located at [PROJECT_ROOT]/source/ via "[right-click on root project]/Add/Existing Files ..."
 * Add the required frameworks / libraries and change the build settings accordingly to your development environment.
+* Add the following header files to your project:
+ - MadvertiseView.h
+ - MadvertiseAd.h
+ - MadvertiseUtilities.h
+ - MadvertiseTracker.h
+ - MadvertiseDelegationProtocol.h
+ - MRAdView.h
+ - MPAdBrowserController.h
+ - JSONKit.h
 * Embed the MadvertiseView as shown in the sample app.
-* Make sure the appId method of your delegate returns the token, that you get when creating an app on our "platform":https://app.madvertise.de/register.
+* Make sure the appId method of your delegate returns the token (YourSDKDelegate should implement the MadvertiseDelegationProtocol), that you get when creating an app on our "platform":https://app.madvertise.de/register.
 
-h3.    Embedding the banner type Rich Media
+bc.. #import "YourSDKDelegate.h"
+
+@implementation YourSDKDelegate
+
+- (NSString *) appId {
+  return @"TestTokn";
+}
+
+@end
+
+h3. Embedding the banner type Rich Media
 
 Please consider the differences in behaviour and embedding of those ads to guarantee a seamlessly working user experience!
 
