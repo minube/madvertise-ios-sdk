@@ -197,7 +197,14 @@ static NSString *const kMovieWillExitNotification42 =
 }
 
 - (void)animateFromFlippedStateToDefaultState {
+    
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 50000 // iOS 5.0+
+    [[self viewControllerForPresentingModalView] dismissViewControllerAnimated:YES completion:^{
+        
+    }];
+#else
     [[self viewControllerForPresentingModalView] dismissModalViewControllerAnimated:YES];
+#endif
     _expansionContentView.frame = _defaultFrameInKeyWindow;
     
     [self moveViewFromWindowToDefaultSuperview];
@@ -286,7 +293,13 @@ shouldLockOrientation:(BOOL)shouldLockOrientation {
     UIViewController* flip = [[UIViewController alloc] init];
     flip.view = _expansionContentView;
     flip.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 50000 // iOS 5.0+
+    [[self viewControllerForPresentingModalView] presentViewController:flip animated:YES completion:^{
+        
+    }];
+#else
     [[self viewControllerForPresentingModalView] presentModalViewController:flip animated:YES];
+#endif
     [flip release];
     
     isFlipped = true;
