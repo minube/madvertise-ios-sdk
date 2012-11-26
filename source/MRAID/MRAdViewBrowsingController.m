@@ -24,12 +24,17 @@
 - (void)openBrowserWithUrlString:(NSString *)urlString enableBack:(BOOL)back
                    enableForward:(BOOL)forward enableRefresh:(BOOL)refresh {
     NSURL *url = [NSURL URLWithString:urlString];
-    MPAdBrowserController *controller = [[MPAdBrowserController alloc] initWithURL:url 
-                                                                          delegate:self];
+    MPAdBrowserController *controller = [[[MPAdBrowserController alloc] initWithURL:url
+                                                                          delegate:self]autorelease];
     
     [_view adWillPresentModalView];
+    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 50000 // iOS 5.0+
+    [self.viewControllerForPresentingModalView presentViewController:controller animated:YES completion:^{
+        
+    }];
+    #else
     [self.viewControllerForPresentingModalView presentModalViewController:controller animated:YES];
-    [controller release];
+    #endif
 }
 
 #pragma mark -
@@ -39,9 +44,15 @@
     [self dismissBrowserController:browserController animated:YES];
 }
 
-- (void)dismissBrowserController:(MPAdBrowserController *)browserController 
+- (void)dismissBrowserController:(MPAdBrowserController *)browserController
                         animated:(BOOL)animated {
+    #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 50000 // iOS 5.0+
+    [self.viewControllerForPresentingModalView dismissViewControllerAnimated:animated completion:^{
+        
+    }];
+    #else
     [self.viewControllerForPresentingModalView dismissModalViewControllerAnimated:animated];
+    #endif
     //[_view adWillShow];
     [_view adDidDismissModalView];
     //[_view adDidShow];
