@@ -452,8 +452,8 @@ int const MadvertiseAdClass_toHeight[] = {
         MadLog(@"No ad to show or reloading suspended");
         return;
     }
-
-    self.frame = CGRectMake(x, y , ([ad width] != 0) ? [ad width] : MadvertiseAdClass_toWidth[currentAdClass], ([ad height] != 0) ? [ad height] : MadvertiseAdClass_toHeight[currentAdClass]);
+    LogFrame(self.frame);
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y , ([ad width] != 0) ? [ad width] : MadvertiseAdClass_toWidth[currentAdClass], ([ad height] != 0) ? [ad height] : MadvertiseAdClass_toHeight[currentAdClass]);
 
     CGRect frame = CGRectMake(0, 0, ([ad width] != 0) ? [ad width] : MadvertiseAdClass_toWidth[currentAdClass], ([ad height] != 0) ? [ad height] : MadvertiseAdClass_toHeight[currentAdClass]);
 
