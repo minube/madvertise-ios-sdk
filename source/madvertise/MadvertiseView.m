@@ -279,6 +279,9 @@ int const MadvertiseAdClass_toHeight[] = {
 
     [lock unlock];
     [self createAdReloadTimer];
+    if (madDelegate) {
+        [madDelegate bannerView:self didFailToReceiveAdWithError:nil];
+    }
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
@@ -302,6 +305,9 @@ int const MadvertiseAdClass_toHeight[] = {
     } else {
         _bannerLoaded = NO;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
+        if (madDelegate) {
+            [madDelegate bannerView:self didFailToReceiveAdWithError:nil];
+        }
     }
 
     self.request = nil;
