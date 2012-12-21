@@ -70,6 +70,7 @@ typedef enum tagMadvertiseAdClass {
 @property (nonatomic, retain) NSTimer *timer;
 @property (nonatomic, retain) NSURLConnection *conn;
 @property (nonatomic, retain) NSMutableData *receivedData;
+@property (nonatomic, readonly, getter=isBannerLoaded) BOOL bannerLoaded;
 
 - (MadvertiseView*)initWithDelegate:(id<MadvertiseDelegationProtocol>)delegate withClass:(MadvertiseAdClass)adClassValue placementType:(MRAdViewPlacementType) type secondsToRefresh:(int)secondsToRefresh;
 - (CGSize)getParentViewDimensions;

@@ -25,7 +25,7 @@
 @synthesize receivedData;
 @synthesize madDelegate;
 @synthesize currentAdClass;
-
+@synthesize bannerLoaded=_bannerLoaded;
 NSString *const MadvertiseAdClass_toString[] = {
     @"mma",
     @"medium_rectangle",
@@ -201,6 +201,7 @@ int const MadvertiseAdClass_toHeight[] = {
         animationType       = MadvertiseAnimationClassCurlDown;
         server_url          = @"http://ad.madvertise.de";
         lock                = [[NSLock alloc] init];
+        _bannerLoaded       = NO;
 
         if ([madDelegate respondsToSelector:@selector(durationOfBannerAnimation)]) {
             animationDuration = [madDelegate durationOfBannerAnimation];
@@ -248,7 +249,9 @@ int const MadvertiseAdClass_toHeight[] = {
         y = 0;
     }
 }
-
+- (BOOL)isBannerLoaded{
+    return _bannerLoaded;
+}
 #pragma mark - server connection handling
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
@@ -269,7 +272,7 @@ int const MadvertiseAdClass_toHeight[] = {
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     MadLog(@"Failed to receive ad");
     MadLog(@"%@",[error description]);
-
+    _bannerLoaded = NO;
     self.request = nil;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
@@ -284,15 +287,20 @@ int const MadvertiseAdClass_toHeight[] = {
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if (responseCode == 200) {
+        _bannerLoaded = YES;
         MadLog(@"Deserializing json");
 
         NSDictionary *dictionary = [receivedData objectFromJSONData];
-
+        
+        if (madDelegate) {
+            [madDelegate bannerViewWillLoadAd:self];
+        }
         MadLog(@"Creating ad");
         MadvertiseAd *ad = [[MadvertiseAd alloc] initFromDictionary:dictionary];
         [ad autorelease];
         [self createNewViewWithAd:ad];
     } else {
+        _bannerLoaded = NO;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
     }
 
@@ -544,7 +552,9 @@ int const MadvertiseAdClass_toHeight[] = {
     [self swapViews];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoaded" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidLoad" object:self];
-
+    if (madDelegate) {
+        [madDelegate bannerViewDidLoadAd:self];
+    }
     [self createAdReloadTimer];
 }
 
@@ -552,7 +562,10 @@ int const MadvertiseAdClass_toHeight[] = {
     [self setHidden:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseAdLoadFailed" object:self];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"MadvertiseMRaidAdDidFailToload" object:self];
-
+    
+    if (madDelegate) {
+        [madDelegate bannerView:self didFailToReceiveAdWithError:nil];
+    }
     [self createAdReloadTimer];
 }
 
