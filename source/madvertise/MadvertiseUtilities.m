@@ -197,7 +197,7 @@ NSString* UserAgentString() {
 }
 
 + (NSString*) getDeviceOrientation {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    UIDeviceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (UIDeviceOrientationIsLandscape(orientation)) {
         return @"landscape";
     } else {
